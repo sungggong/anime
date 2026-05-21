@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="취향과 기분에 맞춰 애니메이션을 추천하는 다크 모드 랜딩 사이트 AniPick." />
+  <title>AniPick | 오늘 볼 애니 추천</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..900;1,9..40,300..900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['DM Sans', 'Noto Sans KR', 'system-ui', 'sans-serif'],
+            kr: ['Noto Sans KR', 'DM Sans', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            ink: '#0b0b0f',
+            panel: '#121218',
+            card: '#181822',
+            line: '#292936',
+            mint: '#1ed760',
+            neon: '#8b5cf6',
+            rose: '#fb7185',
+            sky: '#38bdf8',
+          },
+          boxShadow: {
+            glow: '0 0 60px rgba(30, 215, 96, 0.18)',
+            card: '0 24px 80px rgba(0, 0, 0, 0.45)',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="bg-ink text-white antialiased">
+  <div class="site-noise" aria-hidden="true"></div>
+  <div class="orb orb-green" aria-hidden="true"></div>
+  <div class="orb orb-purple" aria-hidden="true"></div>
+
+  <header class="sticky top-0 z-50 border-b border-white/10 bg-ink/75 backdrop-blur-xl">
+    <nav class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8" aria-label="주요 메뉴">
+      <a href="#top" class="flex items-center gap-3" aria-label="AniPick 홈">
+        <span class="grid h-10 w-10 place-items-center rounded-2xl bg-mint text-xl font-black text-black shadow-glow">A</span>
+        <span>
+          <strong class="block text-lg leading-none tracking-tight">AniPick</strong>
+          <small class="text-xs uppercase tracking-[0.28em] text-white/45">anime radar</small>
+        </span>
+      </a>
+      <button id="menuButton" class="rounded-full border border-white/10 px-4 py-2 text-sm text-white/80 md:hidden" type="button" aria-expanded="false" aria-controls="mobileMenu">메뉴</button>
+      <div class="hidden items-center gap-8 text-sm font-semibold text-white/70 md:flex">
+        <a class="nav-link" href="#recommend">추천</a>
+        <a class="nav-link" href="#mood">취향 선택</a>
+        <a class="nav-link" href="#ranking">랭킹</a>
+        <a class="nav-link" href="#watchlist">찜 목록</a>
+        <a class="rounded-full bg-white px-5 py-2.5 font-bold text-black transition hover:bg-mint" href="#mood">오늘의 Pick</a>
+      </div>
+    </nav>
+    <div id="mobileMenu" class="hidden border-t border-white/10 bg-panel px-5 py-4 md:hidden">
+      <div class="flex flex-col gap-4 text-sm font-semibold text-white/75">
+        <a href="#recommend">추천</a>
+        <a href="#mood">취향 선택</a>
+        <a href="#ranking">랭킹</a>
+        <a href="#watchlist">찜 목록</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="relative overflow-hidden px-5 py-16 sm:py-24 lg:px-8 lg:py-28">
+      <div class="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+        <div class="relative z-10">
+          <div class="mb-6 inline-flex items-center gap-2 rounded-full border border-mint/25 bg-mint/10 px-4 py-2 text-sm font-bold text-mint">
+            <span class="h-2 w-2 rounded-full bg-mint animate-pulse"></span>
+            취향 기반 애니 추천 큐레이터
+          </div>
+          <h1 class="max-w-4xl font-kr text-5xl font-black leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl">
+            오늘 밤 볼 애니,<br />
+            <span class="hero-gradient">기분에 맞춰</span> 골라줘.
+          </h1>
+          <p class="mt-7 max-w-2xl text-lg leading-8 text-white/65">
+            액션, 힐링, 로맨스, 미스터리까지. AniPick은 복잡한 검색 대신 지금의 취향과 몰입도에 맞는 작품을 빠르게 추천해 주는 단일 페이지 애니 추천 사이트입니다.
+          </p>
+          <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+            <a class="btn-primary" href="#mood">취향 테스트 시작</a>
+            <button id="randomHeroButton" class="btn-secondary" type="button">랜덤 추천 받기</button>
+          </div>
+          <dl class="mt-10 grid max-w-xl grid-cols-3 gap-4">
+            <div class="stat-card"><dt>작품</dt><dd>12+</dd></div>
+            <div class="stat-card"><dt>장르</dt><dd>6</dd></div>
+            <div class="stat-card"><dt>추천</dt><dd>즉시</dd></div>
+          </dl>
+        </div>
+
+        <div class="relative z-10">
+          <div class="hero-console mx-auto max-w-xl rounded-[2rem] border border-white/10 bg-card/85 p-4 shadow-card backdrop-blur">
+            <div class="mb-4 flex items-center justify-between px-2">
+              <div class="flex gap-2"><span class="dot bg-rose"></span><span class="dot bg-yellow-300"></span><span class="dot bg-mint"></span></div>
+              <span class="rounded-full bg-white/5 px-3 py-1 text-xs font-bold text-white/45">LIVE MATCHING</span>
+            </div>
+            <article id="heroPick" class="featured-card min-h-[430px] rounded-[1.5rem] p-6">
+              <!-- JS 랜덤 추천 카드 -->
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="recommend" class="px-5 py-16 lg:px-8">
+      <div class="mx-auto max-w-7xl">
+        <div class="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p class="section-kicker">curated shelf</p>
+            <h2 class="font-kr text-3xl font-black tracking-tight sm:text-4xl">지금 인기 있는 추천작</h2>
+            <p class="mt-3 max-w-2xl text-white/55">카드를 누르면 찜 목록에 저장됩니다. 브라우저 로컬 저장소를 사용해서 새로고침해도 유지돼요.</p>
+          </div>
+          <div class="flex flex-wrap gap-2" role="group" aria-label="장르 필터">
+            <button class="filter-chip active" data-filter="all" type="button">전체</button>
+            <button class="filter-chip" data-filter="action" type="button">액션</button>
+            <button class="filter-chip" data-filter="healing" type="button">힐링</button>
+            <button class="filter-chip" data-filter="romance" type="button">로맨스</button>
+            <button class="filter-chip" data-filter="mystery" type="button">미스터리</button>
+            <button class="filter-chip" data-filter="fantasy" type="button">판타지</button>
+          </div>
+        </div>
+        <div id="animeGrid" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
+      </div>
+    </section>
+
+    <section id="mood" class="px-5 py-16 lg:px-8">
+      <div class="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+        <div class="rounded-[2rem] border border-white/10 bg-panel p-7 shadow-card">
+          <p class="section-kicker">mood selector</p>
+          <h2 class="font-kr text-3xl font-black">오늘의 기분을 골라줘</h2>
+          <p class="mt-3 text-white/55">선택한 분위기에 맞춰 가장 잘 어울리는 애니를 바로 추천합니다.</p>
+          <div class="mt-7 grid gap-3 sm:grid-cols-2">
+            <button class="mood-button" data-mood="power" type="button">🔥 전투력 충전</button>
+            <button class="mood-button" data-mood="comfort" type="button">🌿 마음 힐링</button>
+            <button class="mood-button" data-mood="heart" type="button">💗 설렘 충전</button>
+            <button class="mood-button" data-mood="brain" type="button">🧠 추리/반전</button>
+          </div>
+        </div>
+        <article id="moodResult" class="result-panel rounded-[2rem] border border-white/10 bg-card p-7 shadow-card">
+          <p class="text-sm font-bold uppercase tracking-[0.24em] text-mint">recommended for you</p>
+          <h3 class="mt-4 font-kr text-3xl font-black">버튼을 눌러 추천을 받아보세요</h3>
+          <p class="mt-4 text-white/60">장르, 러닝타임 느낌, 몰입도 기준으로 오늘 보기 좋은 작품을 보여드릴게요.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="ranking" class="px-5 py-16 lg:px-8">
+      <div class="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-gradient-to-br from-white/[0.08] to-white/[0.025] p-6 shadow-card sm:p-8">
+        <div class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div>
+            <p class="section-kicker">weekly chart</p>
+            <h2 class="font-kr text-3xl font-black">이번 주 몰입도 랭킹</h2>
+          </div>
+          <button id="shuffleRanking" class="btn-secondary" type="button">랭킹 섞기</button>
+        </div>
+        <ol id="rankingList" class="grid gap-3"></ol>
+      </div>
+    </section>
+
+    <section id="watchlist" class="px-5 py-16 lg:px-8">
+      <div class="mx-auto max-w-7xl">
+        <div class="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p class="section-kicker">my shelf</p>
+            <h2 class="font-kr text-3xl font-black">내가 찜한 애니</h2>
+            <p class="mt-3 text-white/55">추천 카드의 + 버튼을 눌러 감상 후보를 모아보세요.</p>
+          </div>
+          <button id="clearWatchlist" class="rounded-full border border-white/10 px-5 py-3 text-sm font-bold text-white/60 transition hover:border-rose/50 hover:text-rose" type="button">찜 목록 비우기</button>
+        </div>
+        <div id="watchlistItems" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-white/10 px-5 py-10 text-center text-sm text-white/45 lg:px-8">
+    <p>© 2026 AniPick. Built with HTML, Tailwind CSS CDN, CSS, and JavaScript.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
