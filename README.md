@@ -10,6 +10,43 @@
 - 개인화 설문 기반 애니 추천 점수 계산
 - 장르 필터, 랜덤 추천, 찜 목록 저장
 - 28개 애니 데이터와 실제 커버 이미지 기반 소개 카드
+- 방문자 행동 분석 준비: 방문, 메뉴 클릭, 장르 필터, 프로필 선택, 계절/테마 변경, 설문 제출, 찜 추가/삭제 이벤트 추적
+- 분석 동의 배너 포함: 방문자가 허용한 뒤 익명 이벤트만 전송
+
+## 방문자 행동 분석 설정
+
+GitHub Pages는 정적 사이트라서 자체적으로 방문자 행동 데이터를 저장할 서버가 없습니다. 그래서 Google Analytics 4 같은 외부 분석 서비스를 연결해야 실제 대시보드에서 확인할 수 있습니다.
+
+1. Google Analytics에서 웹 스트림을 만들고 `G-XXXXXXXXXX` 형식의 측정 ID를 받습니다.
+2. `analytics-config.js` 파일의 `measurementId` 값을 채웁니다.
+
+```js
+window.ANIPICK_ANALYTICS_CONFIG = {
+  provider: 'ga4',
+  measurementId: 'G-XXXXXXXXXX',
+  enabled: true,
+  requireConsent: true,
+};
+```
+
+측정 ID가 비어 있으면 실제 전송은 하지 않고, 로컬 테스트에서는 콘솔 로그로만 확인됩니다.
+
+추적 이벤트 예시:
+
+- `page_view`
+- `nav_click`
+- `profile_select`
+- `survey_submit`
+- `season_change`
+- `theme_change`
+- `genre_filter`
+- `random_pick`
+- `watchlist_add`
+- `watchlist_remove`
+- `watchlist_clear`
+- `recommendation_candidate_open`
+
+주의: 이 사이트는 이름/연락처 같은 개인정보를 수집하지 않고, 익명 세션 ID와 행동 이벤트만 추적하도록 설계했습니다.
 
 ## 이미지 출처
 

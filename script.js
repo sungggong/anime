@@ -60,6 +60,12 @@ function poster(anime){
   </div>`;
 }
 function addButton(id, label = '+'){ return `<button class="icon-button" type="button" data-add="${id}" aria-label="찜하기">${label}</button>`; }
+function trackEvent(name, params = {}){
+  window.AniPickAnalytics?.track?.(name, params);
+}
+function animePayload(anime){
+  return anime ? { anime_id: anime.id, anime_title: anime.title, anime_genre: anime.genre } : {};
+}
 
 function renderHero(anime = recommendByProfile()[0]?.anime || pickRandom()){
   $('#heroPick').innerHTML = `${poster(anime)}<div class="mt-5 flex items-start justify-between gap-4"><div><p class="kicker">today's seasonal pick</p><h2 class="font-kr text-3xl font-black">${anime.title}</h2></div>${addButton(anime.id)}</div><p class="mt-4 leading-7 text-[var(--muted)]">${anime.summary}</p><p class="mt-4 rounded-2xl border border-[var(--line)] bg-black/10 p-4 text-sm leading-6">추천 이유: ${anime.reason}</p>`;
@@ -94,6 +100,7 @@ function renderSurveyResult(answers = null){
   const top = ranked[0];
   const percent = Math.min(99, Math.round((top.score / 170) * 100));
   $('#surveyResult').innerHTML = `<p class="kicker">your best match</p><div class="grid gap-6 md:grid-cols-[.82fr_1fr] md:items-center">${poster(top.anime)}<div><h3 class="font-kr text-3xl font-black">${top.anime.title}</h3><p class="mt-3 text-[var(--muted)]">${top.anime.summary}</p><div class="mt-5"><div class="mb-2 flex justify-between text-sm font-black"><span>취향 매칭률</span><span>${percent}%</span></div><div class="match-meter"><span style="width:${percent}%"></span></div></div><p class="mt-4 rounded-2xl border border-[var(--line)] bg-black/10 p-4 text-sm leading-6">${top.anime.reason}</p>${addButton(top.anime.id, '＋ 찜')}</div></div><div class="mt-6 grid gap-3 sm:grid-cols-2">${ranked.slice(1,5).map(({anime,score})=>`<button class="watch-card text-left" data-hero="${anime.id}" type="button"><strong>${anime.title}</strong><small class="mt-1 block text-[var(--muted)]">후보 점수 ${score}</small></button>`).join('')}</div>`;
+  return { top, percent, selected };
 }
 
 function renderGrid(){
@@ -105,34 +112,35 @@ function renderWatchlist(){
   if(!items.length){ $('#watchlistItems').innerHTML = `<div class="watch-card sm:col-span-2 lg:col-span-3 text-[var(--muted)]">아직 찜한 작품이 없습니다. 추천 카드의 + 버튼을 눌러 저장해보세요.</div>`; return; }
   $('#watchlistItems').innerHTML = items.map(anime => `<article class="watch-card"><div class="flex items-start justify-between gap-4"><div><p class="kicker !mb-1">saved</p><h3 class="font-kr text-xl font-black">${anime.title}</h3></div><button class="rounded-full border border-[var(--line)] px-3 py-1 text-sm font-black" data-remove="${anime.id}" type="button">삭제</button></div><p class="mt-3 text-sm leading-6 text-[var(--muted)]">${anime.reason}</p></article>`).join('');
 }
-function addToWatchlist(id){ if(!watchlist.includes(id)){ watchlist.push(id); saveWatchlist(); renderWatchlist(); } }
-function removeFromWatchlist(id){ watchlist = watchlist.filter(item => item !== id); saveWatchlist(); renderWatchlist(); }
+function addToWatchlist(id){ if(!watchlist.includes(id)){ watchlist.push(id); saveWatchlist(); renderWatchlist(); trackEvent('watchlist_add', animePayload(findAnime(id))); } }
+function removeFromWatchlist(id){ const anime = findAnime(id); watchlist = watchlist.filter(item => item !== id); saveWatchlist(); renderWatchlist(); trackEvent('watchlist_remove', animePayload(anime)); }
 
-function setTheme(theme){ document.documentElement.dataset.theme = theme; localStorage.setItem('anipick-theme', theme); const label = theme === 'dark' ? '🌙 Dark' : '☀️ Light'; $$('#themeToggle,#themeToggleMobile').forEach(btn=>{ if(btn) btn.textContent = label; }); }
+function setTheme(theme, options = {}){ document.documentElement.dataset.theme = theme; localStorage.setItem('anipick-theme', theme); const label = theme === 'dark' ? '🌙 Dark' : '☀️ Light'; $$('#themeToggle,#themeToggleMobile').forEach(btn=>{ if(btn) btn.textContent = label; }); if(!options.silent) trackEvent('theme_change', { theme }); }
 function toggleTheme(){ setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'); }
-function setSeason(season){ document.documentElement.dataset.season = season; localStorage.setItem('anipick-season', season); $$('.season-card').forEach(btn=>btn.classList.toggle('active', btn.dataset.season===season)); renderParticles(season); }
+function setSeason(season, options = {}){ document.documentElement.dataset.season = season; localStorage.setItem('anipick-season', season); $$('.season-card').forEach(btn=>btn.classList.toggle('active', btn.dataset.season===season)); renderParticles(season); if(!options.silent) trackEvent('season_change', { season }); }
 function renderParticles(season){ const symbols = seasonParticle[season]; const wrap = $('#particles'); wrap.innerHTML = Array.from({length:34},(_,i)=>`<span style="left:${Math.random()*100}vw;animation-duration:${8+Math.random()*10}s;animation-delay:${Math.random()*-12}s;--drift:${(Math.random()*160-80).toFixed(0)}px">${symbols[i%symbols.length]}</span>`).join(''); }
 
 function bindEvents(){
-  $('#menuButton')?.addEventListener('click', e => { const menu = $('#mobileMenu'); const open = !menu.classList.contains('hidden'); menu.classList.toggle('hidden'); e.currentTarget.setAttribute('aria-expanded', String(!open)); });
+  $('#menuButton')?.addEventListener('click', e => { const menu = $('#mobileMenu'); const open = !menu.classList.contains('hidden'); menu.classList.toggle('hidden'); e.currentTarget.setAttribute('aria-expanded', String(!open)); trackEvent('mobile_menu_toggle', { open: String(!open) }); });
   $$('#themeToggle,#themeToggleMobile').forEach(btn=>btn?.addEventListener('click', toggleTheme));
-  $('#profileGrid').addEventListener('click', e => { const card = e.target.closest('[data-profile]'); if(!card) return; activeProfile = card.dataset.profile; localStorage.setItem('anipick-profile', activeProfile); renderProfiles(); renderSurveyResult(); renderHero(); });
+  $('#profileGrid').addEventListener('click', e => { const card = e.target.closest('[data-profile]'); if(!card) return; activeProfile = card.dataset.profile; localStorage.setItem('anipick-profile', activeProfile); renderProfiles(); renderSurveyResult(); renderHero(); trackEvent('profile_select', { profile: activeProfile }); });
   $$('.season-card').forEach(btn=>btn.addEventListener('click',()=>setSeason(btn.dataset.season)));
-  $$('.filter-chip').forEach(btn=>btn.addEventListener('click',()=>{ $$('.filter-chip').forEach(c=>c.classList.remove('active')); btn.classList.add('active'); currentFilter=btn.dataset.filter; renderGrid(); }));
-  $('#surveyForm').addEventListener('submit', e => { e.preventDefault(); renderSurveyResult(getAnswers()); $('#surveyResult').scrollIntoView({behavior:'smooth', block:'center'}); });
-  $('#randomHeroButton').addEventListener('click',()=>renderHero(pickRandom()));
-  $('#clearWatchlist').addEventListener('click',()=>{ watchlist=[]; saveWatchlist(); renderWatchlist(); });
+  $$('.filter-chip').forEach(btn=>btn.addEventListener('click',()=>{ $$('.filter-chip').forEach(c=>c.classList.remove('active')); btn.classList.add('active'); currentFilter=btn.dataset.filter; renderGrid(); trackEvent('genre_filter', { filter: currentFilter }); }));
+  $('#surveyForm').addEventListener('submit', e => { e.preventDefault(); const answers = getAnswers(); const result = renderSurveyResult(answers); trackEvent('survey_submit', Object.assign({}, answers, { match_percent: result.percent }, animePayload(result.top.anime))); $('#surveyResult').scrollIntoView({behavior:'smooth', block:'center'}); });
+  $('#randomHeroButton').addEventListener('click',()=>{ const anime = pickRandom(); renderHero(anime); trackEvent('random_pick', animePayload(anime)); });
+  $('#clearWatchlist').addEventListener('click',()=>{ const count = watchlist.length; watchlist=[]; saveWatchlist(); renderWatchlist(); trackEvent('watchlist_clear', { removed_count: count }); });
   document.body.addEventListener('click', e => {
-    const add=e.target.closest('[data-add]'); const rem=e.target.closest('[data-remove]'); const hero=e.target.closest('[data-hero]');
+    const nav = e.target.closest('a[href^="#"]'); const add=e.target.closest('[data-add]'); const rem=e.target.closest('[data-remove]'); const hero=e.target.closest('[data-hero]');
+    if(nav) trackEvent('nav_click', { target: nav.getAttribute('href'), label: nav.textContent.trim().slice(0, 40) });
     if(add){ const original = add.textContent; addToWatchlist(add.dataset.add); add.textContent='✓'; setTimeout(()=>{ add.textContent = original; },800); }
     if(rem) removeFromWatchlist(rem.dataset.remove);
-    if(hero) { renderHero(findAnime(hero.dataset.hero)); $('#top').scrollIntoView({behavior:'smooth'}); }
+    if(hero) { const anime = findAnime(hero.dataset.hero); renderHero(anime); trackEvent('recommendation_candidate_open', animePayload(anime)); $('#top').scrollIntoView({behavior:'smooth'}); }
   });
 }
 
 function init(){
-  setTheme(localStorage.getItem('anipick-theme') || 'dark');
-  setSeason(localStorage.getItem('anipick-season') || 'spring');
+  setTheme(localStorage.getItem('anipick-theme') || 'dark', { silent: true });
+  setSeason(localStorage.getItem('anipick-season') || 'spring', { silent: true });
   renderProfiles(); renderHero(); renderSurveyResult(); renderGrid(); renderWatchlist(); bindEvents();
 }
 document.addEventListener('DOMContentLoaded', init);
