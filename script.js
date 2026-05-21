@@ -1,16 +1,32 @@
 const animeList = [
-  { id:'frieren', title:'장송의 프리렌', genre:'fantasy', mood:'comfort', world:'fantasy', pace:'slow', length:'medium', score:98, symbol:'旅', palette:['#32d583','#60a5fa'], tags:['판타지','힐링','여운'], summary:'마왕을 쓰러뜨린 이후의 시간을 따라가며 모험의 의미와 기억을 되짚는 감성 판타지.', reason:'조용하지만 깊은 여운과 아름다운 작화가 필요할 때 가장 안정적인 선택이에요.' },
-  { id:'jjk', title:'주술회전', genre:'action', mood:'power', world:'modern', pace:'fast', length:'medium', score:94, symbol:'呪', palette:['#8b5cf6','#111827'], tags:['액션','다크','능력 배틀'], summary:'저주와 주술사가 충돌하는 세계에서 펼쳐지는 빠르고 강렬한 현대 퇴마 액션.', reason:'속도감 있는 전투와 스타일리시한 연출을 원한다면 추천해요.' },
-  { id:'spy-family', title:'스파이 패밀리', genre:'healing', mood:'comfort', world:'modern', pace:'balanced', length:'short', score:91, symbol:'家', palette:['#fb7185','#facc15'], tags:['코미디','가족','힐링'], summary:'스파이, 암살자, 초능력자가 가짜 가족으로 만나 진짜 같은 일상을 만들어가는 코미디.', reason:'부담 없이 웃고 싶거나 같이 보기 좋은 작품을 찾을 때 좋아요.' },
-  { id:'your-lie', title:'4월은 너의 거짓말', genre:'romance', mood:'heart', world:'modern', pace:'slow', length:'medium', score:90, symbol:'音', palette:['#38bdf8','#fb7185'], tags:['로맨스','음악','감동'], summary:'음악을 잃은 피아노 소년이 바이올리니스트를 만나 다시 감정을 마주하는 이야기.', reason:'감정선이 진하고 음악이 오래 남는 로맨스를 보고 싶을 때 잘 맞아요.' },
-  { id:'steins-gate', title:'슈타인즈 게이트', genre:'mystery', mood:'brain', world:'sf', pace:'slow', length:'medium', score:97, symbol:'時', palette:['#22c55e','#64748b'], tags:['SF','타임리프','반전'], summary:'우연한 시간 간섭 실험이 세계선을 뒤흔드는 SF 스릴러.', reason:'초반 빌드업 뒤에 터지는 강한 몰입감과 반전을 원한다면 강력 추천해요.' },
-  { id:'demon-slayer', title:'귀멸의 칼날', genre:'action', mood:'power', world:'japan', pace:'fast', length:'medium', score:93, symbol:'炎', palette:['#f97316','#dc2626'], tags:['액션','일본풍','작화'], summary:'혈귀가 된 여동생을 되돌리기 위해 검사가 되는 소년의 성장 액션.', reason:'화려한 전투 연출과 일본풍 시대극 분위기를 즐기기 좋아요.' },
-  { id:'apothecary', title:'약사의 혼잣말', genre:'mystery', mood:'brain', world:'japan', pace:'balanced', length:'medium', score:92, symbol:'薬', palette:['#14b8a6','#a855f7'], tags:['추리','궁중','캐릭터'], summary:'약학 지식과 관찰력을 가진 마오마오가 궁중 사건을 풀어가는 미스터리 드라마.', reason:'날카로운 추리와 매력적인 주인공의 티키타카를 좋아한다면 잘 맞아요.' },
-  { id:'haikyu', title:'하이큐!!', genre:'healing', mood:'power', world:'modern', pace:'fast', length:'long', score:95, symbol:'翔', palette:['#f97316','#111827'], tags:['스포츠','성장','팀워크'], summary:'작은 키의 배구 소년이 팀원들과 함께 한계를 넘어서는 청춘 스포츠 애니.', reason:'기분을 끌어올리고 싶을 때 노력과 팀워크의 에너지가 확실히 전달돼요.' },
-  { id:'violet', title:'바이올렛 에버가든', genre:'healing', mood:'comfort', world:'fantasy', pace:'slow', length:'short', score:96, symbol:'便', palette:['#60a5fa','#a78bfa'], tags:['힐링','감동','작화'], summary:'감정을 배우는 자동수기인형이 편지를 통해 사람들의 마음을 이어주는 이야기.', reason:'아름다운 영상미와 잔잔한 감동을 원할 때 최고의 선택지 중 하나예요.' },
-  { id:'kaguya', title:'카구야 님은 고백받고 싶어', genre:'romance', mood:'heart', world:'modern', pace:'fast', length:'short', score:93, symbol:'恋', palette:['#fb7185','#8b5cf6'], tags:['로맨스','코미디','두뇌전'], summary:'서로 좋아하지만 먼저 고백하지 않으려는 두 천재의 귀여운 심리전 로맨틱 코미디.', reason:'웃기면서 설레는 로맨스를 원한다면 실패 확률이 낮아요.' },
-  { id:'aot', title:'진격의 거인', genre:'action', mood:'brain', world:'fantasy', pace:'fast', length:'long', score:99, symbol:'壁', palette:['#9ca3af','#7f1d1d'], tags:['액션','정치극','반전'], summary:'거인에게 둘러싸인 세계의 진실을 추적하며 전쟁, 자유, 선택을 다루는 대서사시.', reason:'압도적인 스케일과 끊임없는 반전, 무거운 주제를 원할 때 추천해요.' },
-  { id:'mushoku', title:'무직전생', genre:'fantasy', mood:'power', world:'fantasy', pace:'balanced', length:'long', score:89, symbol:'魔', palette:['#34d399','#2563eb'], tags:['이세계','판타지','성장'], summary:'새로운 세계에서 다시 태어난 주인공이 마법과 모험 속에서 삶을 배워가는 판타지.', reason:'정통 판타지 모험과 성장형 서사를 길게 즐기고 싶을 때 좋아요.' }
+  { id:'frieren', title:'장송의 프리렌', genre:'fantasy', mood:'comfort', world:'fantasy', pace:'slow', length:'medium', score:98, symbol:'旅', image:'https://cdn.myanimelist.net/images/anime/1015/138006l.webp', tags:['판타지','힐링','여운'], summary:'마왕을 쓰러뜨린 이후의 시간을 따라가며 모험의 의미와 기억을 되짚는 감성 판타지.', reason:'조용하지만 깊은 여운과 아름다운 작화가 필요할 때 가장 안정적인 선택이에요.' },
+  { id:'jjk', title:'주술회전', genre:'action', mood:'power', world:'modern', pace:'fast', length:'medium', score:94, symbol:'呪', image:'https://cdn.myanimelist.net/images/anime/1171/109222l.webp', tags:['액션','다크','능력 배틀'], summary:'저주와 주술사가 충돌하는 세계에서 펼쳐지는 빠르고 강렬한 현대 퇴마 액션.', reason:'속도감 있는 전투와 스타일리시한 연출을 원한다면 추천해요.' },
+  { id:'spy-family', title:'스파이 패밀리', genre:'healing', mood:'comfort', world:'modern', pace:'balanced', length:'short', score:91, symbol:'家', image:'https://cdn.myanimelist.net/images/anime/1441/122795l.webp', tags:['코미디','가족','힐링'], summary:'스파이, 암살자, 초능력자가 가짜 가족으로 만나 진짜 같은 일상을 만들어가는 코미디.', reason:'부담 없이 웃고 싶거나 같이 보기 좋은 작품을 찾을 때 좋아요.' },
+  { id:'your-lie', title:'4월은 너의 거짓말', genre:'romance', mood:'heart', world:'modern', pace:'slow', length:'medium', score:90, symbol:'音', image:'https://cdn.myanimelist.net/images/anime/1405/143284l.webp', tags:['로맨스','음악','감동'], summary:'음악을 잃은 피아노 소년이 바이올리니스트를 만나 다시 감정을 마주하는 이야기.', reason:'감정선이 진하고 음악이 오래 남는 로맨스를 보고 싶을 때 잘 맞아요.' },
+  { id:'steins-gate', title:'슈타인즈 게이트', genre:'mystery', mood:'brain', world:'sf', pace:'slow', length:'medium', score:97, symbol:'時', image:'https://cdn.myanimelist.net/images/anime/1935/127974l.webp', tags:['SF','타임리프','반전'], summary:'우연한 시간 간섭 실험이 세계선을 뒤흔드는 SF 스릴러.', reason:'초반 빌드업 뒤에 터지는 강한 몰입감과 반전을 원한다면 강력 추천해요.' },
+  { id:'demon-slayer', title:'귀멸의 칼날', genre:'action', mood:'power', world:'japan', pace:'fast', length:'medium', score:93, symbol:'炎', image:'https://cdn.myanimelist.net/images/anime/1286/99889l.webp', tags:['액션','일본풍','작화'], summary:'혈귀가 된 여동생을 되돌리기 위해 검사가 되는 소년의 성장 액션.', reason:'화려한 전투 연출과 일본풍 시대극 분위기를 즐기기 좋아요.' },
+  { id:'apothecary', title:'약사의 혼잣말', genre:'mystery', mood:'brain', world:'japan', pace:'balanced', length:'medium', score:92, symbol:'薬', image:'https://cdn.myanimelist.net/images/anime/1708/138033l.webp', tags:['추리','궁중','캐릭터'], summary:'약학 지식과 관찰력을 가진 마오마오가 궁중 사건을 풀어가는 미스터리 드라마.', reason:'날카로운 추리와 매력적인 주인공의 티키타카를 좋아한다면 잘 맞아요.' },
+  { id:'haikyu', title:'하이큐!!', genre:'healing', mood:'power', world:'modern', pace:'fast', length:'long', score:95, symbol:'翔', image:'https://cdn.myanimelist.net/images/anime/7/76014l.webp', tags:['스포츠','성장','팀워크'], summary:'작은 키의 배구 소년이 팀원들과 함께 한계를 넘어서는 청춘 스포츠 애니.', reason:'기분을 끌어올리고 싶을 때 노력과 팀워크의 에너지가 확실히 전달돼요.' },
+  { id:'violet', title:'바이올렛 에버가든', genre:'healing', mood:'comfort', world:'fantasy', pace:'slow', length:'short', score:96, symbol:'便', image:'https://cdn.myanimelist.net/images/anime/1795/95088l.webp', tags:['힐링','감동','작화'], summary:'감정을 배우는 자동수기인형이 편지를 통해 사람들의 마음을 이어주는 이야기.', reason:'아름다운 영상미와 잔잔한 감동을 원할 때 최고의 선택지 중 하나예요.' },
+  { id:'kaguya', title:'카구야 님은 고백받고 싶어', genre:'romance', mood:'heart', world:'modern', pace:'fast', length:'short', score:93, symbol:'恋', image:'https://cdn.myanimelist.net/images/anime/1295/106551l.webp', tags:['로맨스','코미디','두뇌전'], summary:'서로 좋아하지만 먼저 고백하지 않으려는 두 천재의 귀여운 심리전 로맨틱 코미디.', reason:'웃기면서 설레는 로맨스를 원한다면 실패 확률이 낮아요.' },
+  { id:'aot', title:'진격의 거인', genre:'action', mood:'brain', world:'fantasy', pace:'fast', length:'long', score:99, symbol:'壁', image:'https://cdn.myanimelist.net/images/anime/10/47347l.webp', tags:['액션','정치극','반전'], summary:'거인에게 둘러싸인 세계의 진실을 추적하며 전쟁, 자유, 선택을 다루는 대서사시.', reason:'압도적인 스케일과 끊임없는 반전, 무거운 주제를 원할 때 추천해요.' },
+  { id:'mushoku', title:'무직전생', genre:'fantasy', mood:'power', world:'fantasy', pace:'balanced', length:'long', score:89, symbol:'魔', image:'https://cdn.myanimelist.net/images/anime/1530/117776l.webp', tags:['이세계','판타지','성장'], summary:'새로운 세계에서 다시 태어난 주인공이 마법과 모험 속에서 삶을 배워가는 판타지.', reason:'정통 판타지 모험과 성장형 서사를 길게 즐기고 싶을 때 좋아요.' },
+  { id:'naruto', title:'나루토', genre:'action', mood:'power', world:'japan', pace:'balanced', length:'long', score:88, symbol:'忍', image:'https://cdn.myanimelist.net/images/anime/1141/142503l.webp', tags:['닌자','성장','우정'], summary:'닌자 세계에서 인정받고 싶은 소년 나루토가 동료와 함께 성장하는 장편 액션.', reason:'왕도 성장물과 긴 호흡의 캐릭터 서사를 좋아한다면 잘 맞아요.' },
+  { id:'one-piece', title:'원피스', genre:'fantasy', mood:'power', world:'fantasy', pace:'balanced', length:'long', score:97, symbol:'海', image:'https://cdn.myanimelist.net/images/anime/1244/138851l.webp', tags:['모험','해적','동료'], summary:'해적왕을 꿈꾸는 루피와 밀짚모자 일당이 바다를 누비는 대형 모험 서사.', reason:'끝없는 세계관 탐험과 동료애를 길게 즐기고 싶을 때 추천해요.' },
+  { id:'death-note', title:'데스노트', genre:'mystery', mood:'brain', world:'modern', pace:'fast', length:'medium', score:96, symbol:'死', image:'https://cdn.myanimelist.net/images/anime/1079/138100l.webp', tags:['심리전','스릴러','두뇌전'], summary:'이름을 쓰면 사람이 죽는 노트를 얻은 천재와 명탐정의 치열한 심리전.', reason:'한 번 보기 시작하면 멈추기 어려운 두뇌 싸움을 원할 때 좋아요.' },
+  { id:'fmab', title:'강철의 연금술사 BROTHERHOOD', genre:'fantasy', mood:'brain', world:'fantasy', pace:'balanced', length:'long', score:99, symbol:'錬', image:'https://cdn.myanimelist.net/images/anime/1208/94745l.webp', tags:['판타지','모험','완성도'], summary:'금기를 범한 형제가 잃어버린 몸을 되찾기 위해 진실을 추적하는 명작 판타지.', reason:'서사 완성도와 액션, 감동의 균형이 뛰어난 작품을 찾는다면 추천해요.' },
+  { id:'cowboy-bebop', title:'카우보이 비밥', genre:'mystery', mood:'comfort', world:'sf', pace:'slow', length:'short', score:95, symbol:'星', image:'https://cdn.myanimelist.net/images/anime/4/19644l.webp', tags:['SF','느와르','재즈'], summary:'우주 현상금 사냥꾼들의 고독한 여정을 재즈와 느와르 감성으로 그린 클래식.', reason:'세련된 분위기와 에피소드형 감상을 원할 때 잘 맞아요.' },
+  { id:'chainsaw-man', title:'체인소 맨', genre:'action', mood:'power', world:'modern', pace:'fast', length:'short', score:91, symbol:'鋸', image:'https://cdn.myanimelist.net/images/anime/1806/126216l.webp', tags:['액션','고어','악마'], summary:'악마와 계약한 소년 덴지가 잔혹하고도 기묘한 세계에 뛰어드는 다크 액션.', reason:'강렬한 연출과 독특한 캐릭터 감각을 원한다면 추천해요.' },
+  { id:'oshi-no-ko', title:'최애의 아이', genre:'mystery', mood:'brain', world:'modern', pace:'balanced', length:'medium', score:94, symbol:'推', image:'https://cdn.myanimelist.net/images/anime/1812/134736l.webp', tags:['아이돌','미스터리','드라마'], summary:'연예계의 빛과 그림자, 환생과 복수의 미스터리를 결합한 화제작.', reason:'화려한 소재 뒤에 숨은 어두운 진실을 따라가는 이야기를 좋아하면 잘 맞아요.' },
+  { id:'solo-leveling', title:'나 혼자만 레벨업', genre:'action', mood:'power', world:'fantasy', pace:'fast', length:'medium', score:90, symbol:'級', image:'https://cdn.myanimelist.net/images/anime/1801/142390l.webp', tags:['헌터','성장','액션'], summary:'최약체 헌터가 시스템의 힘으로 압도적인 성장 곡선을 그리는 액션 판타지.', reason:'빠른 성장과 시원한 전투 카타르시스를 원할 때 좋아요.' },
+  { id:'mha', title:'나의 히어로 아카데미아', genre:'action', mood:'power', world:'modern', pace:'balanced', length:'long', score:89, symbol:'英', image:'https://cdn.myanimelist.net/images/anime/10/78745l.webp', tags:['히어로','성장','학원'], summary:'개성이 능력이 된 세계에서 히어로를 꿈꾸는 소년의 성장 학원 액션.', reason:'히어로물과 팀 배틀, 성장 서사를 함께 즐기고 싶다면 추천해요.' },
+  { id:'mob-psycho', title:'모브사이코 100', genre:'action', mood:'comfort', world:'modern', pace:'fast', length:'short', score:94, symbol:'霊', image:'https://cdn.myanimelist.net/images/anime/8/80356l.webp', tags:['초능력','코미디','성장'], summary:'강력한 초능력을 가진 평범한 소년 모브가 감정과 성장을 배워가는 이야기.', reason:'유쾌하지만 따뜻한 성장물과 폭발적인 연출을 동시에 원할 때 좋아요.' },
+  { id:'made-in-abyss', title:'메이드 인 어비스', genre:'fantasy', mood:'brain', world:'fantasy', pace:'slow', length:'medium', score:95, symbol:'淵', image:'https://cdn.myanimelist.net/images/anime/6/86733l.webp', tags:['모험','다크','미스터리'], summary:'거대한 구멍 어비스를 탐험하며 아름답고 잔혹한 비밀을 마주하는 모험 판타지.', reason:'귀여운 외형과 대비되는 깊은 미스터리와 어두운 세계관을 원할 때 추천해요.' },
+  { id:'vinland', title:'빈란드 사가', genre:'action', mood:'brain', world:'japan', pace:'slow', length:'long', score:96, symbol:'剣', image:'https://cdn.myanimelist.net/images/anime/1500/103005l.webp', tags:['전쟁','복수','성장'], summary:'바이킹 시대를 배경으로 복수와 전쟁, 인간의 삶을 묵직하게 그린 역사 드라마.', reason:'무게감 있는 성장과 전쟁 서사를 보고 싶다면 잘 맞아요.' },
+  { id:'bocchi', title:'봇치 더 록!', genre:'healing', mood:'comfort', world:'modern', pace:'fast', length:'short', score:92, symbol:'結', image:'https://cdn.myanimelist.net/images/anime/1448/127956l.webp', tags:['밴드','코미디','청춘'], summary:'극도로 낯가리는 소녀가 밴드 활동을 통해 조금씩 세상과 연결되는 음악 코미디.', reason:'가볍게 웃으면서도 청춘의 성장을 느끼고 싶을 때 추천해요.' },
+  { id:'blue-lock', title:'블루 록', genre:'action', mood:'power', world:'modern', pace:'fast', length:'medium', score:88, symbol:'蹴', image:'https://cdn.myanimelist.net/images/anime/1258/126929l.webp', tags:['스포츠','경쟁','축구'], summary:'세계 최고의 스트라이커를 만들기 위한 극한 경쟁 프로젝트를 그린 축구 애니.', reason:'팀워크보다 생존 경쟁에 가까운 뜨거운 스포츠물을 원할 때 좋아요.' },
+  { id:'horimiya', title:'호리미야', genre:'romance', mood:'heart', world:'modern', pace:'balanced', length:'short', score:90, symbol:'恋', image:'https://cdn.myanimelist.net/images/anime/1695/111486l.webp', tags:['로맨스','학원','일상'], summary:'학교와 집에서 다른 얼굴을 가진 두 사람이 가까워지는 따뜻한 학원 로맨스.', reason:'편안하고 사랑스러운 분위기의 로맨스를 찾는다면 추천해요.' },
+  { id:'one-punch', title:'원펀맨', genre:'action', mood:'power', world:'modern', pace:'fast', length:'short', score:92, symbol:'拳', image:'https://cdn.myanimelist.net/images/anime/12/76049l.webp', tags:['히어로','코미디','액션'], summary:'어떤 적이든 한 방에 끝내는 히어로 사이타마의 유쾌하고 시원한 액션 코미디.', reason:'부담 없이 강력한 액션과 웃음을 동시에 원할 때 좋아요.' }
 ];
 
 const profiles = [
@@ -32,8 +48,17 @@ const pickRandom = (items = animeList) => items[Math.floor(Math.random() * items
 const findAnime = id => animeList.find(anime => anime.id === id);
 
 function saveWatchlist(){ localStorage.setItem('anipick-watchlist-v2', JSON.stringify(watchlist)); }
-function animeStyle(anime){ return `--p1:${anime.palette[0]};--p2:${anime.palette[1]};`; }
-function poster(anime){ return `<div class="poster" style="${animeStyle(anime)}" data-symbol="${anime.symbol}"><div class="relative z-10 flex min-h-[15rem] flex-col justify-between p-5"><div class="flex flex-wrap gap-2">${anime.tags.map(t=>`<span class="badge">${t}</span>`).join('')}</div><div><p class="text-sm font-black uppercase tracking-[.22em] text-white/75">match base ${anime.score}</p><h3 class="mt-2 font-kr text-3xl font-black text-white">${anime.title}</h3></div></div></div>`; }
+function animeStyle(anime){ return `--p1:${anime.palette?.[0] || '#8b5cf6'};--p2:${anime.palette?.[1] || '#38bdf8'};`; }
+function poster(anime){
+  return `<div class="poster real-poster" style="${animeStyle(anime)}" data-symbol="${anime.symbol}">
+    <img src="${anime.image}" alt="${anime.title} 공식 커버 이미지" loading="lazy" referrerpolicy="no-referrer" />
+    <div class="poster-shade"></div>
+    <div class="relative z-10 flex min-h-[15rem] flex-col justify-between p-5">
+      <div class="flex flex-wrap gap-2">${anime.tags.map(t=>`<span class="badge">${t}</span>`).join('')}</div>
+      <div><p class="text-sm font-black uppercase tracking-[.22em] text-white/80">match base ${anime.score}</p><h3 class="mt-2 font-kr text-3xl font-black text-white drop-shadow">${anime.title}</h3></div>
+    </div>
+  </div>`;
+}
 function addButton(id, label = '+'){ return `<button class="icon-button" type="button" data-add="${id}" aria-label="찜하기">${label}</button>`; }
 
 function renderHero(anime = recommendByProfile()[0]?.anime || pickRandom()){
@@ -43,7 +68,7 @@ function renderHero(anime = recommendByProfile()[0]?.anime || pickRandom()){
 function renderProfiles(){
   $('#profileGrid').innerHTML = profiles.map(p => `<button class="profile-card ${p.id===activeProfile?'active':''}" data-profile="${p.id}" type="button"><div class="avatar" style="--p1:${p.palette[0]};--p2:${p.palette[1]};">${p.avatar}</div><strong class="mt-4 block font-kr text-xl font-black">${p.name}</strong><small class="mt-1 block text-[var(--muted)]">${profileDescription(p)}</small></button>`).join('');
   const p = profiles.find(item => item.id === activeProfile);
-  $('#activeProfileLabel').textContent = `현재 프로필: ${p.name}`;
+  $('#activeProfileLabel').textContent = `현재 프로필: ${p.name} · 총 ${animeList.length}개 작품`;
 }
 function profileDescription(p){ return {solo:'몰입도와 반전 중심 추천',family:'편하게 같이 보기 좋은 추천',action:'빠른 전개와 전투 중심 추천',romance:'설렘과 감정선 중심 추천'}[p.id]; }
 
@@ -97,7 +122,12 @@ function bindEvents(){
   $('#surveyForm').addEventListener('submit', e => { e.preventDefault(); renderSurveyResult(getAnswers()); $('#surveyResult').scrollIntoView({behavior:'smooth', block:'center'}); });
   $('#randomHeroButton').addEventListener('click',()=>renderHero(pickRandom()));
   $('#clearWatchlist').addEventListener('click',()=>{ watchlist=[]; saveWatchlist(); renderWatchlist(); });
-  document.body.addEventListener('click', e => { const add=e.target.closest('[data-add]'); const rem=e.target.closest('[data-remove]'); const hero=e.target.closest('[data-hero]'); if(add){ addToWatchlist(add.dataset.add); add.textContent='✓'; setTimeout(()=>{add.textContent=add.dataset.add?'＋':'+'},800); } if(rem) removeFromWatchlist(rem.dataset.remove); if(hero) renderHero(findAnime(hero.dataset.hero)); });
+  document.body.addEventListener('click', e => {
+    const add=e.target.closest('[data-add]'); const rem=e.target.closest('[data-remove]'); const hero=e.target.closest('[data-hero]');
+    if(add){ const original = add.textContent; addToWatchlist(add.dataset.add); add.textContent='✓'; setTimeout(()=>{ add.textContent = original; },800); }
+    if(rem) removeFromWatchlist(rem.dataset.remove);
+    if(hero) { renderHero(findAnime(hero.dataset.hero)); $('#top').scrollIntoView({behavior:'smooth'}); }
+  });
 }
 
 function init(){
