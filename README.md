@@ -12,6 +12,22 @@
 - 100개 애니 데이터와 실제 커버 이미지 기반 소개 카드
 - 방문자 행동 분석 준비: 방문, 메뉴 클릭, 장르 필터, 프로필 선택, 테마 변경, 설문 제출, 찜 추가/삭제 이벤트 추적
 - 분석 동의 배너 포함: 방문자가 허용한 뒤 익명 이벤트만 전송
+- 검색 엔진 최적화: title/description/keywords, canonical, Open Graph/Twitter 카드, JSON-LD 구조화 데이터, `robots.txt`, `sitemap.xml`
+
+## 검색 엔진 노출 설정
+
+검색 엔진이 사이트를 더 쉽게 이해하고 색인할 수 있도록 다음 항목을 적용했습니다.
+
+- 대표 주소: `https://sungggong.github.io/anime/`
+- Canonical URL 설정
+- Googlebot/robots 색인 허용 메타태그
+- Open Graph/Twitter 공유 미리보기 태그
+- WebSite, WebApplication, ItemList, FAQPage JSON-LD 구조화 데이터
+- `robots.txt`에서 크롤링 허용 및 sitemap 위치 안내
+- `sitemap.xml` 생성
+- 본문에 "애니 추천", "애니메이션 추천", "볼만한 애니", "취향별 애니 추천" 같은 자연스러운 검색 문구 보강
+
+참고: Google 검색 노출은 Search Console 등록, 색인 처리 시간, 콘텐츠 품질 평가, 외부 링크 등에 따라 달라집니다. 이 저장소에는 검색 엔진이 읽기 쉬운 기술적 SEO 기반을 구축했습니다.
 
 ## 방문자 행동 분석 설정
 
