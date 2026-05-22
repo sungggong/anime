@@ -678,3 +678,14 @@ html[data-theme='dark'] .collection-badge { color: #ffd7dd; }
   .watch-shelf { grid-auto-columns: minmax(10.5rem, 76vw); }
   .shelf-poster { height: 15rem; }
 }
+
+
+.recommend-shell { position: relative; overflow: hidden; }
+.recommend-panel[hidden] { display: none !important; }
+.recommend-panel { animation: panelOpen .28s ease both; }
+.anime-pagination { display: flex; flex-wrap: wrap; justify-content: center; gap: .55rem; margin-top: 2rem; }
+.anime-pagination button { min-width: 2.55rem; border: 1px solid var(--line); border-radius: 999px; padding: .72rem .9rem; background: rgba(255,255,255,.72); color: var(--ink); font-weight: 900; transition: transform .18s ease, border-color .18s ease, background .18s ease; }
+.anime-pagination button:hover:not(:disabled), .anime-pagination button.active { transform: translateY(-2px); border-color: var(--accent); background: var(--accent); color: #fff; }
+.anime-pagination button:disabled { opacity: .45; cursor: not-allowed; }
+html[data-theme='dark'] .anime-pagination button { background: rgba(255,255,255,.08); }
+@keyframes panelOpen { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
