@@ -6,7 +6,7 @@ window.ANIPICK_ADS_CONFIG = {
   enabled: false,
   requireConsent: true,
   showPlaceholders: false,
-  publisherId: '',
+  publisherId: 'ca-pub-3787839285870566',
   slots: {
     top: '',
     inContent: '',
