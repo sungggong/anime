@@ -393,7 +393,7 @@ function renderSurveyQuestion(){
   $('#surveyProgressBar').style.width = `${((surveyStep + 1) / surveyQuestions.length) * 100}%`;
   $('#surveyBackButton').disabled = surveyStep === 0;
   $('#surveyQuestionCard').classList.remove('slide-out');
-  $('#surveyQuestionCard').innerHTML = `<p class="kicker">${q.eyebrow}</p><h3 class="font-kr text-3xl font-black">${q.title}</h3><p class="privacy-note mt-4">선택값은 추천 계산에만 쓰이며, 동의 전에는 분석 이벤트로 보내지 않습니다.</p><div class="survey-option-grid">${q.options.map(option=>`<button class="survey-option" type="button" data-survey-key="${q.key}" data-survey-value="${option.value}">${option.label}<small>${option.detail}</small></button>`).join('')}</div>`;
+  $('#surveyQuestionCard').innerHTML = `<p class="kicker">${q.eyebrow}</p><h3 class="font-kr text-3xl font-black">${q.title}</h3><p class="privacy-note mt-4">망설이지 말고 지금 끌리는 쪽을 골라보세요. 마지막에 가장 잘 맞는 애니를 바로 보여드릴게요.</p><div class="survey-option-grid">${q.options.map(option=>`<button class="survey-option" type="button" data-survey-key="${q.key}" data-survey-value="${option.value}">${option.label}<small>${option.detail}</small></button>`).join('')}</div>`;
 }
 function renderSurveyLoading(){
   $('#surveyResult').innerHTML = `<div class="result-loading"><div><div class="result-orb" aria-hidden="true"></div><p class="kicker">calculating taste signal</p><h3 class="font-kr text-3xl font-black">취향 파장을 계산 중...</h3><p class="mt-3 text-[var(--muted)]">선택한 감정선과 프로필을 매칭하고 있어요.</p></div></div>`;
