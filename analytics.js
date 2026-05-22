@@ -34,6 +34,9 @@
       initProvider();
       flushQueue();
       track('analytics_consent_granted');
+      trackPageView();
+    } else {
+      state.queue = [];
     }
   }
 

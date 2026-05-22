@@ -1,10 +1,10 @@
 // AniPick analytics configuration
-// 1) Google Analytics 4를 쓰려면 measurementId에 G-XXXXXXXXXX 값을 넣으세요.
-// 2) Umami/Plausible 같은 서비스를 쓰려면 provider와 endpoint 설정을 바꾸면 됩니다.
-// 3) 값이 비어 있으면 실제 전송은 하지 않고 브라우저 콘솔에만 기록됩니다.
+// Google Analytics 4 측정 ID(G-XXXXXXXXXX)를 넣으면 즉시 실제 GA4로 전송됩니다.
+// 아직 측정 ID가 없으면 빈 문자열로 두세요. 로컬 테스트에서는 콘솔 로그만 출력됩니다.
+// 방문자에게 동의 배너를 먼저 보여준 뒤, 허용한 경우에만 익명 이벤트를 전송합니다.
 window.ANIPICK_ANALYTICS_CONFIG = {
   provider: 'ga4',
-  measurementId: '',
+  measurementId: '', // 예: 'G-XXXXXXXXXX'
   enabled: true,
   requireConsent: true,
   anonymizeIp: true,
