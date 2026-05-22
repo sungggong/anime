@@ -1,16 +1,16 @@
-# AniPick - 계절/프로필/설문 기반 애니 추천 사이트
+# AniPick - 신사 배경/프로필/설문 기반 애니 추천 사이트
 
-일본풍 계절 배경, 다크/라이트 모드, OTT 스타일 프로필, 개인화 설문 추천 시스템을 갖춘 단일 페이지 애니 추천 웹사이트입니다.
+차분한 신사 실루엣 배경, 다크/라이트 모드, OTT 스타일 프로필, 개인화 설문 추천 시스템을 갖춘 단일 페이지 애니 추천 웹사이트입니다.
 
 ## 주요 기능
 
-- 일본풍 계절 배경: 봄/여름/가을/겨울 선택
+- 세련된 신사 배경: 계절별 전환 없이 고요한 밤의 신사/토리이 실루엣 중심 디자인
 - 다크 모드 / 라이트 모드 전환 및 localStorage 저장
 - OTT 서비스에서 익숙한 프로필 선택 UX를 자체 디자인으로 구현
 - 개인화 설문 기반 애니 추천 점수 계산
 - 장르 필터, 랜덤 추천, 찜 목록 저장
 - 28개 애니 데이터와 실제 커버 이미지 기반 소개 카드
-- 방문자 행동 분석 준비: 방문, 메뉴 클릭, 장르 필터, 프로필 선택, 계절/테마 변경, 설문 제출, 찜 추가/삭제 이벤트 추적
+- 방문자 행동 분석 준비: 방문, 메뉴 클릭, 장르 필터, 프로필 선택, 테마 변경, 설문 제출, 찜 추가/삭제 이벤트 추적
 - 분석 동의 배너 포함: 방문자가 허용한 뒤 익명 이벤트만 전송
 
 ## 방문자 행동 분석 설정
@@ -37,7 +37,6 @@ window.ANIPICK_ANALYTICS_CONFIG = {
 - `nav_click`
 - `profile_select`
 - `survey_submit`
-- `season_change`
 - `theme_change`
 - `genre_filter`
 - `random_pick`
@@ -55,8 +54,10 @@ window.ANIPICK_ANALYTICS_CONFIG = {
 ## 파일 구성
 
 - `index.html` - 페이지 구조와 Tailwind CSS CDN 설정
-- `style.css` - 계절별 배경, 테마, 카드 UI 스타일
-- `script.js` - 추천 데이터, 설문 점수 계산, 프로필/계절/테마/찜 기능
+- `style.css` - 신사 배경, 테마, 카드 UI 스타일
+- `script.js` - 추천 데이터, 설문 점수 계산, 프로필/테마/찜 기능
+- `analytics-config.js` - 분석 제공자/측정 ID 설정
+- `analytics.js` - 익명 분석 이벤트와 동의 배너 처리
 
 ## 실행
 
@@ -68,4 +69,4 @@ python -m http.server 4173
 
 ## 백업
 
-업데이트 전 버전은 GitHub의 `backup/pre-japanese-seasonal-update` 브랜치와 `pre-japanese-seasonal-update-*` 태그로 보존됩니다.
+업데이트 전 버전은 GitHub의 백업 브랜치와 태그로 보존됩니다. 이번 신사 배경 리디자인 전 버전은 `backup/pre-shrine-redesign` 브랜치와 `pre-shrine-redesign-*` 태그로 보존됩니다.

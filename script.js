@@ -37,7 +37,6 @@ const profiles = [
 ];
 
 const genreLabels = { action:'액션', healing:'힐링', romance:'로맨스', mystery:'미스터리', fantasy:'판타지' };
-const seasonParticle = { spring:['🌸','花'], summer:['✨','祭'], autumn:['🍁','秋'], winter:['❄','雪'] };
 let currentFilter = 'all';
 let activeProfile = localStorage.getItem('anipick-profile') || 'solo';
 let watchlist = JSON.parse(localStorage.getItem('anipick-watchlist-v2') || '[]');
@@ -68,7 +67,7 @@ function animePayload(anime){
 }
 
 function renderHero(anime = recommendByProfile()[0]?.anime || pickRandom()){
-  $('#heroPick').innerHTML = `${poster(anime)}<div class="mt-5 flex items-start justify-between gap-4"><div><p class="kicker">today's seasonal pick</p><h2 class="font-kr text-3xl font-black">${anime.title}</h2></div>${addButton(anime.id)}</div><p class="mt-4 leading-7 text-[var(--muted)]">${anime.summary}</p><p class="mt-4 rounded-2xl border border-[var(--line)] bg-black/10 p-4 text-sm leading-6">추천 이유: ${anime.reason}</p>`;
+  $('#heroPick').innerHTML = `${poster(anime)}<div class="mt-5 flex items-start justify-between gap-4"><div><p class="kicker">today's quiet pick</p><h2 class="font-kr text-3xl font-black">${anime.title}</h2></div>${addButton(anime.id)}</div><p class="mt-4 leading-7 text-[var(--muted)]">${anime.summary}</p><p class="mt-4 rounded-2xl border border-[var(--line)] bg-black/10 p-4 text-sm leading-6">추천 이유: ${anime.reason}</p>`;
 }
 
 function renderProfiles(){
@@ -117,14 +116,10 @@ function removeFromWatchlist(id){ const anime = findAnime(id); watchlist = watch
 
 function setTheme(theme, options = {}){ document.documentElement.dataset.theme = theme; localStorage.setItem('anipick-theme', theme); const label = theme === 'dark' ? '🌙 Dark' : '☀️ Light'; $$('#themeToggle,#themeToggleMobile').forEach(btn=>{ if(btn) btn.textContent = label; }); if(!options.silent) trackEvent('theme_change', { theme }); }
 function toggleTheme(){ setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'); }
-function setSeason(season, options = {}){ document.documentElement.dataset.season = season; localStorage.setItem('anipick-season', season); $$('.season-card').forEach(btn=>btn.classList.toggle('active', btn.dataset.season===season)); renderParticles(season); if(!options.silent) trackEvent('season_change', { season }); }
-function renderParticles(season){ const symbols = seasonParticle[season]; const wrap = $('#particles'); wrap.innerHTML = Array.from({length:34},(_,i)=>`<span style="left:${Math.random()*100}vw;animation-duration:${8+Math.random()*10}s;animation-delay:${Math.random()*-12}s;--drift:${(Math.random()*160-80).toFixed(0)}px">${symbols[i%symbols.length]}</span>`).join(''); }
-
 function bindEvents(){
   $('#menuButton')?.addEventListener('click', e => { const menu = $('#mobileMenu'); const open = !menu.classList.contains('hidden'); menu.classList.toggle('hidden'); e.currentTarget.setAttribute('aria-expanded', String(!open)); trackEvent('mobile_menu_toggle', { open: String(!open) }); });
   $$('#themeToggle,#themeToggleMobile').forEach(btn=>btn?.addEventListener('click', toggleTheme));
   $('#profileGrid').addEventListener('click', e => { const card = e.target.closest('[data-profile]'); if(!card) return; activeProfile = card.dataset.profile; localStorage.setItem('anipick-profile', activeProfile); renderProfiles(); renderSurveyResult(); renderHero(); trackEvent('profile_select', { profile: activeProfile }); });
-  $$('.season-card').forEach(btn=>btn.addEventListener('click',()=>setSeason(btn.dataset.season)));
   $$('.filter-chip').forEach(btn=>btn.addEventListener('click',()=>{ $$('.filter-chip').forEach(c=>c.classList.remove('active')); btn.classList.add('active'); currentFilter=btn.dataset.filter; renderGrid(); trackEvent('genre_filter', { filter: currentFilter }); }));
   $('#surveyForm').addEventListener('submit', e => { e.preventDefault(); const answers = getAnswers(); const result = renderSurveyResult(answers); trackEvent('survey_submit', Object.assign({}, answers, { match_percent: result.percent }, animePayload(result.top.anime))); $('#surveyResult').scrollIntoView({behavior:'smooth', block:'center'}); });
   $('#randomHeroButton').addEventListener('click',()=>{ const anime = pickRandom(); renderHero(anime); trackEvent('random_pick', animePayload(anime)); });
@@ -140,7 +135,6 @@ function bindEvents(){
 
 function init(){
   setTheme(localStorage.getItem('anipick-theme') || 'dark', { silent: true });
-  setSeason(localStorage.getItem('anipick-season') || 'spring', { silent: true });
   renderProfiles(); renderHero(); renderSurveyResult(); renderGrid(); renderWatchlist(); bindEvents();
 }
 document.addEventListener('DOMContentLoaded', init);
