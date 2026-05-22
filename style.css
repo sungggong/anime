@@ -445,6 +445,25 @@ legend { margin-bottom: .8rem; font-weight: 900; }
 .anime-card { overflow: hidden; }
 .watch-card { padding: 1.15rem; }
 
+.ad-wrap { position: relative; z-index: 2; }
+.ad-slot {
+  min-height: 7.5rem;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 1.35rem;
+  background: linear-gradient(135deg, rgba(var(--accent-rgb), .07), rgba(255,255,255,.55));
+  box-shadow: rgba(153,27,27,.08) 0 18px 60px -34px;
+}
+.ad-slot--compact { min-height: 5.5rem; }
+.ad-slot--hidden { display: none; }
+.ad-slot--placeholder { gap: .2rem; color: var(--muted); text-align: center; }
+.ad-slot--placeholder strong { color: var(--text); font-size: .98rem; }
+.ad-slot--placeholder small { color: var(--muted); font-size: .78rem; }
+.ad-slot-label { display: block; color: var(--accent); font-size: .68rem; font-weight: 950; letter-spacing: .22em; }
+html[data-theme='dark'] .ad-slot { background: linear-gradient(135deg, rgba(var(--accent-rgb), .12), rgba(255,255,255,.045)); }
+
 .analytics-consent {
   position: fixed;
   left: 50%;

@@ -46,10 +46,12 @@
     if (value === 'granted') {
       initProvider();
       flushQueue();
+      window.AniPickAds?.refresh?.();
       track('analytics_consent_granted');
       trackPageView();
     } else {
       state.queue = [];
+      window.AniPickAds?.refresh?.();
     }
   }
 
@@ -60,8 +62,8 @@
     banner.className = 'analytics-consent';
     banner.innerHTML = `
       <div>
-        <strong>방문 분석 안내</strong>
-        <p>사이트 개선을 위해 동의 후에만 익명 방문/클릭/설문 선택 이벤트를 수집할 수 있어요. 이름, 연락처, 자유 입력 개인정보는 수집하지 않습니다.</p>
+        <strong>사이트 경험 설정</strong>
+        <p>동의하면 방문 분석과 광고 표시가 활성화됩니다. 거절해도 추천 기능은 그대로 사용할 수 있어요.</p>
       </div>
       <div class="analytics-consent-actions">
         <button type="button" data-analytics-consent="denied">거절</button>

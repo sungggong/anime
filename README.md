@@ -21,6 +21,7 @@
 - 200개 애니 데이터와 한글 제목 기반 소개 카드
 - 방문자 행동 분석 준비: 방문, 메뉴 클릭, 장르 필터, 프로필 선택, 테마 변경, 설문 제출, 찜 추가/삭제 이벤트 추적
 - 개인정보/보안 우선: GA4 스크립트는 방문자가 허용한 뒤에만 로드하고, 동의 전 행동 이벤트는 저장/대기열 처리하지 않음
+- 광고 수익화 준비: Google AdSense 승인 후 `ads-config.js`에 게시자 ID와 광고 슬롯 ID를 넣으면 스폰서 영역이 실제 광고로 전환됨
 - 검색 엔진 최적화: title/description/keywords, canonical, Open Graph/Twitter 카드, JSON-LD 구조화 데이터, `robots.txt`, `sitemap.xml`
 
 ## 검색 엔진 노출 설정
@@ -73,6 +74,27 @@ window.ANIPICK_ANALYTICS_CONFIG = {
 
 주의: 이 사이트는 이름/연락처 같은 개인정보를 수집하지 않고, 방문자가 분석을 허용한 뒤에만 익명 세션 ID와 행동 이벤트를 전송하도록 설계했습니다.
 
+## 광고 수익화 설정
+
+현재 사이트에는 광고가 들어갈 위치와 AdSense 로더가 준비되어 있습니다. 실제 광고를 띄우려면 Google AdSense 승인 후 `ads-config.js`를 수정하세요.
+
+```js
+window.ANIPICK_ADS_CONFIG = {
+  provider: 'adsense',
+  enabled: true,
+  requireConsent: true,
+  showPlaceholders: false,
+  publisherId: 'ca-pub-1234567890123456',
+  slots: {
+    top: '1234567890',
+    inContent: '2345678901',
+    bottom: '3456789012',
+  },
+};
+```
+
+AdSense 신청 전에는 `enabled: false`를 유지합니다. `ca-pub-...` 게시자 ID와 광고 슬롯 ID는 웹에 노출되는 공개 식별자이며 비밀번호가 아닙니다. 다만 승인 전 임의의 값을 넣어도 수익이 발생하지 않으므로 실제 승인 정보만 사용하세요. 현재 로더는 방문자가 동의하기 전에는 AdSense 스크립트를 로드하지 않습니다.
+
 ## 이미지 출처
 
 애니 소개 카드의 커버 이미지는 Jikan API를 통해 확인한 공개 MyAnimeList CDN 이미지 URL을 사용합니다. 브랜드 로고/OTT 공식 자산은 사용하지 않고, 작품 커버 이미지 중심으로 카드 UI를 구성했습니다.
@@ -84,6 +106,8 @@ window.ANIPICK_ANALYTICS_CONFIG = {
 - `script.js` - 추천 데이터, 설문 점수 계산, 프로필/테마/찜 기능
 - `analytics-config.js` - 분석 제공자/측정 ID 설정
 - `analytics.js` - 익명 분석 이벤트와 동의 배너 처리
+- `ads-config.js` - AdSense 게시자 ID/광고 슬롯 설정
+- `ads.js` - 광고 슬롯 렌더링과 AdSense 로더
 
 ## 실행
 

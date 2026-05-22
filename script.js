@@ -372,7 +372,7 @@ function dailyMoodPick(){
 }
 function renderMoodPickBanner(){
   const anime = dailyMoodPick(); const dayText = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'][new Date().getDay()]; const hour = new Date().getHours(); const timeText = hour < 12 ? '아침' : hour < 18 ? '오후' : '밤';
-  $('#moodPickBanner').innerHTML = `<div><p class="kicker">daily mood pick</p><h2 id="moodPickTitle" class="font-kr text-3xl font-black">오늘은 ${dayText} ${timeText}, 이 한 편 어때요?</h2><p class="mt-3 leading-7 text-[var(--muted)]">${anime.title} · ${anime.reason}</p><p class="recommend-reason mt-4">${reasonForAnime(anime)} / 날짜와 시간대만 브라우저에서 계산하며 개인 정보는 전송하지 않습니다.</p><div class="mt-5 flex flex-wrap gap-3"><button class="btn-primary" type="button" data-hero="${anime.id}">오늘의 픽 자세히 보기</button>${addButton(anime.id, '＋ 찜')}</div></div><img class="mood-pick-thumb" src="${anime.image}" alt="${anime.title} 포스터" loading="lazy" />`;
+  $('#moodPickBanner').innerHTML = `<div><p class="kicker">daily mood pick</p><h2 id="moodPickTitle" class="font-kr text-3xl font-black">오늘은 ${dayText} ${timeText}, 이 한 편 어때요?</h2><p class="mt-3 leading-7 text-[var(--muted)]">${anime.title} · ${anime.reason}</p><p class="recommend-reason mt-4">${reasonForAnime(anime)} · 지금 시간대와 잘 맞는 분위기 픽</p><div class="mt-5 flex flex-wrap gap-3"><button class="btn-primary" type="button" data-hero="${anime.id}">오늘의 픽 자세히 보기</button>${addButton(anime.id, '＋ 찜')}</div></div><img class="mood-pick-thumb" src="${anime.image}" alt="${anime.title} 포스터" loading="lazy" />`;
 }
 
 function renderProfiles(){
