@@ -171,6 +171,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <aside id="themeNudge" class="theme-nudge hidden" aria-live="polite"></aside>
   <div class="shrine-stage" aria-hidden="true">
     <div class="shrine-moon"></div>
     <div class="shrine-silhouette">
@@ -290,8 +291,19 @@
     </section>
 
     <section id="watchlist" class="mx-auto max-w-7xl px-5 py-14 lg:px-8">
-      <div class="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between"><div><p class="kicker">my shelf</p><h2 class="section-title">찜한 감상 후보</h2></div><button id="clearWatchlist" class="btn-secondary" type="button">찜 목록 비우기</button></div>
-      <div id="watchlistItems" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+      <div class="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p class="kicker">my anime shelf</p>
+          <h2 class="section-title">나만의 시각적 서재</h2>
+          <p class="mt-3 text-[var(--muted)]">찜한 포스터를 책장처럼 모으고, 보고 싶어요/시청 중/완료 상태를 localStorage에 저장합니다.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <span id="watchlistCountBadge" class="collection-badge">당신의 컬렉션 0편</span>
+          <button id="clearWatchlist" class="btn-secondary" type="button">찜 목록 비우기</button>
+        </div>
+      </div>
+      <div id="watchlistStatusTabs" class="watch-status-tabs" role="group" aria-label="찜 목록 상태 필터"></div>
+      <div id="watchlistItems" class="watch-shelf" aria-live="polite"></div>
     </section>
   </main>
 

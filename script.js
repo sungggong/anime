@@ -126,13 +126,16 @@ let heroBackdropTimer;
 let currentFilter = 'all';
 let activeProfile = localStorage.getItem('anipick-profile') || 'solo';
 let watchlist = JSON.parse(localStorage.getItem('anipick-watchlist-v2') || '[]');
+let watchStatus = JSON.parse(localStorage.getItem('anipick-watch-status-v1') || '{}');
+let currentWatchFilter = 'all';
+let lastSurveyResult = null;
 
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
 const pickRandom = (items = animeList) => items[Math.floor(Math.random() * items.length)];
 const findAnime = id => animeList.find(anime => anime.id === id);
 
-function saveWatchlist(){ localStorage.setItem('anipick-watchlist-v2', JSON.stringify(watchlist)); }
+function saveWatchlist(){ localStorage.setItem('anipick-watchlist-v2', JSON.stringify(watchlist)); localStorage.setItem('anipick-watch-status-v1', JSON.stringify(watchStatus)); }
 function animeStyle(anime){ return `--p1:${anime.palette?.[0] || '#8b5cf6'};--p2:${anime.palette?.[1] || '#38bdf8'};`; }
 function malScore(anime){ return (anime.score / 10).toFixed(1); }
 function episodeLabel(anime){ return { short:'약 12화/극장판', medium:'약 24화 전후', long:'장편·시리즈' }[anime.length] || '정보 확인 중'; }
@@ -161,6 +164,8 @@ function poster(anime){
   </div>`;
 }
 function addButton(id, label = '+'){ return `<button class="icon-button" type="button" data-add="${id}" aria-label="찜하기">${label}</button>`; }
+function statusLabel(status){ return { want:'보고 싶어요', watching:'시청 중', done:'완료' }[status || 'want']; }
+function statusIcon(status){ return { want:'☆', watching:'▶', done:'✓' }[status || 'want']; }
 function trackEvent(name, params = {}){
   window.AniPickAnalytics?.track?.(name, params);
 }
@@ -215,7 +220,17 @@ function renderSurveyQuestion(){
   $('#surveyQuestionCard').classList.remove('slide-out');
   $('#surveyQuestionCard').innerHTML = `<p class="kicker">${q.eyebrow}</p><h3 class="font-kr text-3xl font-black">${q.title}</h3><p class="privacy-note mt-4">선택값은 추천 계산에만 쓰이며, 동의 전에는 분석 이벤트로 보내지 않습니다.</p><div class="survey-option-grid">${q.options.map(option=>`<button class="survey-option" type="button" data-survey-key="${q.key}" data-survey-value="${option.value}">${option.label}<small>${option.detail}</small></button>`).join('')}</div>`;
 }
-function completeSurvey(){ const result = renderSurveyResult(surveyAnswers, true); trackEvent('survey_submit', Object.assign({}, surveyAnswers, { match_percent: result.percent }, animePayload(result.top.anime))); $('#surveyResult').scrollIntoView({behavior:'smooth', block:'center'}); }
+function renderSurveyLoading(){
+  $('#surveyResult').innerHTML = `<div class="result-loading"><div><div class="result-orb" aria-hidden="true"></div><p class="kicker">calculating taste signal</p><h3 class="font-kr text-3xl font-black">취향 파장을 계산 중...</h3><p class="mt-3 text-[var(--muted)]">선택한 감정선과 프로필을 매칭하고 있어요.</p></div></div>`;
+}
+function completeSurvey(){
+  renderSurveyLoading();
+  $('#surveyResult').scrollIntoView({behavior:'smooth', block:'center'});
+  setTimeout(()=>{
+    const result = renderSurveyResult(surveyAnswers, true);
+    trackEvent('survey_submit', Object.assign({}, surveyAnswers, { match_percent: result.percent }, animePayload(result.top.anime)));
+  }, 1500);
+}
 function selectSurveyAnswer(key, value){ surveyAnswers[key] = value; $('#surveyQuestionCard').classList.add('slide-out'); setTimeout(()=>{ if(surveyStep < surveyQuestions.length - 1){ surveyStep += 1; renderSurveyQuestion(); } else { renderSurveyQuestion(); completeSurvey(); } }, 230); }
 function resetSurvey(){ surveyAnswers = { ...defaultSurveyAnswers }; surveyStep = 0; renderSurveyQuestion(); renderSurveyResult(surveyAnswers); }
 function recommendByProfile(){
@@ -228,7 +243,9 @@ function renderSurveyResult(answers = null, animated = false){
   const ranked = animeList.map(anime => ({ anime, score: scoreAnime(anime, selected) })).sort((a,b)=>b.score-a.score);
   const top = ranked[0];
   const percent = Math.min(99, Math.round((top.score / 170) * 100));
-  $('#surveyResult').innerHTML = `<p class="kicker">your best match</p><div class="grid gap-6 md:grid-cols-[.82fr_1fr] md:items-center ${animated?'animate-pulse':''}">${poster(top.anime)}<div><h3 class="font-kr text-3xl font-black">${top.anime.title}</h3><p class="mt-3 text-[var(--muted)]">${top.anime.summary}</p><div class="mt-5"><div class="mb-2 flex justify-between text-sm font-black"><span>취향 매칭률</span><span>${percent}%</span></div><div class="match-meter"><span style="width:${percent}%"></span></div></div><p class="recommend-reason mt-4">${reasonForAnime(top.anime, selected)}</p><p class="mt-3 rounded-2xl border border-[var(--line)] bg-black/10 p-4 text-sm leading-6">${top.anime.reason}</p>${addButton(top.anime.id, '＋ 찜')}</div></div><div class="mt-6 grid gap-3 sm:grid-cols-2">${ranked.slice(1,5).map(({anime,score})=>`<button class="watch-card text-left" data-hero="${anime.id}" type="button"><strong>${anime.title}</strong><small class="mt-1 block text-[var(--muted)]">후보 점수 ${score} · ${reasonForAnime(anime, selected)}</small></button>`).join('')}</div>`;
+  lastSurveyResult = { top, percent, selected, ranked };
+  const tasteText = `${moodLabels[selected.mood]} + ${paceLabels[selected.pace]}형`;
+  $('#surveyResult').innerHTML = `<div class="result-reveal"><p class="kicker">your best match</p><div class="result-hero-card grid gap-6 md:grid-cols-[.82fr_1fr] md:items-center">${poster(top.anime)}<div><h3 class="font-kr text-4xl font-black">${top.anime.title}</h3><p class="mt-2 text-sm font-black text-[var(--accent)]">${tasteText}</p><p class="mt-3 text-[var(--muted)]">${top.anime.summary}</p><div class="mt-5"><div class="mb-2 flex justify-between text-sm font-black"><span>취향 매칭률</span><span>${percent}%</span></div><div class="match-meter"><span style="width:${percent}%"></span></div></div><p class="recommend-reason mt-4">${reasonForAnime(top.anime, selected)}</p><p class="mt-3 rounded-2xl border border-[var(--line)] bg-black/10 p-4 text-sm leading-6">${top.anime.reason}</p><div class="mt-4 flex flex-wrap gap-2">${addButton(top.anime.id, '＋ 찜')}<button class="btn-secondary" type="button" data-share-result>내 취향 결과 공유하기</button></div></div></div><div class="share-result-card"><div id="shareCardPreview" class="share-preview"><p class="kicker !mb-2">AniPick result</p><strong>나는 ${tasteText} 🎌</strong><p class="mt-2 text-white/75">추천 1위: ${top.anime.title} · 매칭률 ${percent}%</p></div><div class="share-actions"><button type="button" data-share-result>공유하기</button><button class="secondary" type="button" data-download-result>결과 카드 PNG 저장</button></div></div><div class="mt-6 grid gap-3 sm:grid-cols-2">${ranked.slice(1,5).map(({anime,score},i)=>`<button class="watch-card result-candidate text-left" style="animation-delay:${(i+1)*0.12}s" data-hero="${anime.id}" type="button"><strong>${i+2}위 · ${anime.title}</strong><small class="mt-1 block text-[var(--muted)]">후보 점수 ${score} · ${reasonForAnime(anime, selected)}</small></button>`).join('')}</div></div>`;
   return { top, percent, selected };
 }
 
@@ -236,16 +253,87 @@ function renderGrid(){
   const items = currentFilter === 'all' ? animeList : animeList.filter(anime => anime.genre === currentFilter);
   $('#animeGrid').innerHTML = items.map(anime => `<article class="anime-card" tabindex="0">${preview(anime)}${poster(anime)}<div class="p-3"><div class="mt-1 flex items-start justify-between gap-4"><div><p class="text-xs font-black uppercase tracking-[.2em] text-[var(--accent)]">${genreLabels[anime.genre]}</p><h3 class="mt-1 font-kr text-xl font-black">${anime.title}</h3></div>${addButton(anime.id)}</div><p class="mt-3 min-h-[4.5rem] text-sm leading-6 text-[var(--muted)]">${anime.summary}</p><p class="recommend-reason mt-3">${reasonForAnime(anime)}</p></div></article>`).join('');
 }
-function renderWatchlist(){
-  const items = watchlist.map(findAnime).filter(Boolean);
-  if(!items.length){ $('#watchlistItems').innerHTML = `<div class="watch-card sm:col-span-2 lg:col-span-3 text-[var(--muted)]">아직 찜한 작품이 없습니다. 추천 카드의 + 버튼을 눌러 저장해보세요.</div>`; return; }
-  $('#watchlistItems').innerHTML = items.map(anime => `<article class="watch-card"><div class="flex items-start justify-between gap-4"><div><p class="kicker !mb-1">saved</p><h3 class="font-kr text-xl font-black">${anime.title}</h3></div><button class="rounded-full border border-[var(--line)] px-3 py-1 text-sm font-black" data-remove="${anime.id}" type="button">삭제</button></div><p class="mt-3 text-sm leading-6 text-[var(--muted)]">${anime.reason}</p></article>`).join('');
+function renderWatchlistTabs(){
+  const counts = watchlist.reduce((acc,id)=>{ const s = watchStatus[id] || 'want'; acc[s] = (acc[s]||0)+1; return acc; }, {});
+  const tabs = [{id:'all',label:`전체 ${watchlist.length}`},{id:'want',label:`보고 싶어요 ${counts.want||0}`},{id:'watching',label:`시청 중 ${counts.watching||0}`},{id:'done',label:`완료 ${counts.done||0}`}];
+  $('#watchlistStatusTabs').innerHTML = tabs.map(tab=>`<button class="${currentWatchFilter===tab.id?'active':''}" type="button" data-watch-filter="${tab.id}">${tab.label}</button>`).join('');
 }
-function addToWatchlist(id){ if(!watchlist.includes(id)){ watchlist.push(id); saveWatchlist(); renderWatchlist(); trackEvent('watchlist_add', animePayload(findAnime(id))); } }
-function removeFromWatchlist(id){ const anime = findAnime(id); watchlist = watchlist.filter(item => item !== id); saveWatchlist(); renderWatchlist(); trackEvent('watchlist_remove', animePayload(anime)); }
+function renderWatchlist(){
+  const countBadge = $('#watchlistCountBadge');
+  if(countBadge) countBadge.textContent = `당신의 컬렉션 ${watchlist.length}편`;
+  renderWatchlistTabs();
+  const items = watchlist.map(findAnime).filter(Boolean).filter(anime => currentWatchFilter === 'all' || (watchStatus[anime.id] || 'want') === currentWatchFilter);
+  if(!watchlist.length){ $('#watchlistItems').innerHTML = `<div class="watch-card watch-shelf-empty text-[var(--muted)]">아직 찜한 작품이 없습니다. 추천 카드의 + 버튼을 눌러 나만의 애니 서재를 시작해보세요.</div>`; return; }
+  if(!items.length){ $('#watchlistItems').innerHTML = `<div class="watch-card watch-shelf-empty text-[var(--muted)]">이 상태의 작품은 아직 없습니다.</div>`; return; }
+  $('#watchlistItems').innerHTML = items.map(anime => {
+    const status = watchStatus[anime.id] || 'want';
+    return `<article class="shelf-card ${status==='done'?'completed':''}"><button class="shelf-remove" data-remove="${anime.id}" type="button" aria-label="${anime.title} 삭제">×</button><div class="shelf-check"><span>✓</span></div><img class="shelf-poster" src="${anime.image}" alt="${anime.title} 포스터" loading="lazy" /><div class="shelf-info"><p class="kicker !mb-1">${statusIcon(status)} ${statusLabel(status)}</p><h3 class="font-kr text-lg font-black">${anime.title}</h3><p class="mt-2 text-xs leading-5 text-[var(--muted)]">${reasonForAnime(anime)}</p><div class="shelf-status">${['want','watching','done'].map(s=>`<button class="${status===s?'active':''}" type="button" data-watch-status="${s}" data-watch-id="${anime.id}">${statusLabel(s)}</button>`).join('')}</div></div></article>`;
+  }).join('');
+}
+function addToWatchlist(id){ if(!watchlist.includes(id)){ watchlist.push(id); watchStatus[id] = watchStatus[id] || 'want'; saveWatchlist(); renderWatchlist(); trackEvent('watchlist_add', animePayload(findAnime(id))); } }
+function removeFromWatchlist(id){ const anime = findAnime(id); watchlist = watchlist.filter(item => item !== id); delete watchStatus[id]; saveWatchlist(); renderWatchlist(); trackEvent('watchlist_remove', animePayload(anime)); }
+function setWatchStatus(id, status){ const anime = findAnime(id); watchStatus[id] = status; saveWatchlist(); renderWatchlist(); trackEvent('watchlist_status_change', Object.assign({ status }, animePayload(anime))); }
 
 function setTheme(theme, options = {}){ document.documentElement.dataset.theme = theme; localStorage.setItem('anipick-theme', theme); const label = theme === 'dark' ? '🌙 Dark' : '☀️ Light'; $$('#themeToggle,#themeToggleMobile').forEach(btn=>{ if(btn) btn.textContent = label; }); if(!options.silent) trackEvent('theme_change', { theme }); }
+function preferredTheme(){ const stored = localStorage.getItem('anipick-theme'); if(stored) return stored; const night = new Date().getHours() >= 18 || new Date().getHours() < 6; const osDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches; return (osDark || night) ? 'dark' : 'light'; }
 function toggleTheme(){ setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'); }
+function maybeShowThemeNudge(){
+  if(localStorage.getItem('anipick-theme-nudge-v1')) return;
+  const nudge = $('#themeNudge'); if(!nudge) return;
+  nudge.classList.remove('hidden');
+  nudge.innerHTML = `<strong>밤 감상엔 다크모드가 더 선명해요</strong><p>OS 설정과 시간대를 참고해 딥네이비 다크모드를 추천합니다. 선택은 이 브라우저에만 저장됩니다.</p><div class="theme-nudge-actions"><button class="accept-dark" type="button" data-theme-choice="dark">다크모드 쓰기</button><button class="keep-light" type="button" data-theme-choice="keep">그냥 볼게요</button></div>`;
+}
+async function createResultImageBlob(){
+  if(!lastSurveyResult) return null;
+  const { top, percent, selected } = lastSurveyResult;
+  const canvas = document.createElement('canvas');
+  canvas.width = 1080; canvas.height = 1350;
+  const ctx = canvas.getContext('2d');
+  const gradient = ctx.createLinearGradient(0,0,1080,1350);
+  gradient.addColorStop(0, '#0d1117'); gradient.addColorStop(.52, '#24111b'); gradient.addColorStop(1, '#e11d2e');
+  ctx.fillStyle = gradient; ctx.fillRect(0,0,1080,1350);
+  ctx.fillStyle = 'rgba(255,255,255,.08)'; ctx.beginPath(); ctx.arc(920,170,230,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#ffffff'; ctx.font = '900 64px sans-serif'; ctx.fillText('AniPick 취향 결과', 80, 150);
+  ctx.font = '900 84px sans-serif'; ctx.fillText(top.anime.title.slice(0, 15), 80, 310);
+  ctx.font = '700 42px sans-serif'; ctx.fillStyle = 'rgba(255,255,255,.82)'; ctx.fillText(`나는 ${moodLabels[selected.mood]} + ${paceLabels[selected.pace]}형 🎌`, 80, 400);
+  ctx.fillStyle = '#ffccd3'; ctx.font = '900 58px sans-serif'; ctx.fillText(`매칭률 ${percent}%`, 80, 520);
+  ctx.fillStyle = 'rgba(255,255,255,.88)'; ctx.font = '700 34px sans-serif'; wrapCanvasText(ctx, reasonForAnime(top.anime, selected), 80, 630, 920, 48);
+  ctx.fillStyle = 'rgba(255,255,255,.78)'; ctx.font = '600 30px sans-serif'; wrapCanvasText(ctx, 'https://sungggong.github.io/anime/', 80, 1190, 920, 42);
+  return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+}
+function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight){
+  const words = text.split(' '); let line = '';
+  for(const word of words){ const test = `${line}${word} `; if(ctx.measureText(test).width > maxWidth && line){ ctx.fillText(line, x, y); line = `${word} `; y += lineHeight; } else line = test; }
+  ctx.fillText(line, x, y);
+}
+async function shareResult(){
+  if(!lastSurveyResult) return;
+  const { top, percent, selected } = lastSurveyResult;
+  const text = `나는 ${moodLabels[selected.mood]} + ${paceLabels[selected.pace]}형 🎌 AniPick 추천 1위는 ${top.anime.title}, 매칭률 ${percent}%!`;
+  const url = 'https://sungggong.github.io/anime/';
+  try {
+    const blob = await createResultImageBlob();
+    const file = blob ? new File([blob], 'anipick-result.png', { type:'image/png' }) : null;
+    if(file && navigator.canShare?.({ files:[file] })) await navigator.share({ title:'AniPick 취향 결과', text, url, files:[file] });
+    else if(navigator.share) await navigator.share({ title:'AniPick 취향 결과', text, url });
+    else { await navigator.clipboard.writeText(`${text} ${url}`); alert('공유 문구를 클립보드에 복사했어요.'); }
+    trackEvent('result_share', animePayload(top.anime));
+  } catch (error) { if(error.name !== 'AbortError') console.warn('share failed', error); }
+}
+async function downloadResultImage(){
+  const blob = await createResultImageBlob(); if(!blob) return;
+  const url = URL.createObjectURL(blob); const a = document.createElement('a');
+  a.href = url; a.download = 'anipick-result.png'; a.click(); URL.revokeObjectURL(url);
+  trackEvent('result_image_download', animePayload(lastSurveyResult.top.anime));
+}
+function initScrollMotion(){
+  const targets = $$('section, .anime-card, .profile-card, .watch-card, .glass-card');
+  targets.forEach((el, index)=>{ el.classList.add('reveal'); el.style.setProperty('--reveal-delay', `${Math.min(index * 0.02, .24)}s`); });
+  const observer = new IntersectionObserver(entries => entries.forEach(entry => { if(entry.isIntersecting){ entry.target.classList.add('is-visible'); observer.unobserve(entry.target); } }), { threshold:.12, rootMargin:'0px 0px -6% 0px' });
+  targets.forEach(el=>observer.observe(el));
+  $$('.hero-backdrop,.shrine-silhouette').forEach(el=>el.classList.add('parallax-soft'));
+  window.addEventListener('scroll', () => { const y = Math.min(36, window.scrollY * .035); $$('.parallax-soft').forEach(el=>el.style.setProperty('--parallax-y', `${y}px`)); }, { passive:true });
+}
 function bindEvents(){
   $('#menuButton')?.addEventListener('click', e => { const menu = $('#mobileMenu'); const open = !menu.classList.contains('hidden'); menu.classList.toggle('hidden'); e.currentTarget.setAttribute('aria-expanded', String(!open)); trackEvent('mobile_menu_toggle', { open: String(!open) }); });
   $$('#themeToggle,#themeToggleMobile').forEach(btn=>btn?.addEventListener('click', toggleTheme));
@@ -255,23 +343,25 @@ function bindEvents(){
   $('#surveyBackButton').addEventListener('click',()=>{ if(surveyStep > 0){ surveyStep -= 1; renderSurveyQuestion(); } });
   $('#surveyResetButton').addEventListener('click', resetSurvey);
   $('#randomHeroButton').addEventListener('click',()=>{ const anime = pickRandom(); renderHero(anime); trackEvent('random_pick', animePayload(anime)); });
-  $('#clearWatchlist').addEventListener('click',()=>{ const count = watchlist.length; watchlist=[]; saveWatchlist(); renderWatchlist(); trackEvent('watchlist_clear', { removed_count: count }); });
+  $('#clearWatchlist').addEventListener('click',()=>{ const count = watchlist.length; watchlist=[]; watchStatus={}; saveWatchlist(); renderWatchlist(); trackEvent('watchlist_clear', { removed_count: count }); });
   document.body.addEventListener('click', e => {
-    const nav = e.target.closest('a[href^="#"]'); const add=e.target.closest('[data-add]'); const rem=e.target.closest('[data-remove]'); const hero=e.target.closest('[data-hero]');
+    const nav = e.target.closest('a[href^="#"]'); const add=e.target.closest('[data-add]'); const rem=e.target.closest('[data-remove]'); const hero=e.target.closest('[data-hero]'); const filter=e.target.closest('[data-watch-filter]'); const status=e.target.closest('[data-watch-status]'); const share=e.target.closest('[data-share-result]'); const download=e.target.closest('[data-download-result]'); const themeChoice=e.target.closest('[data-theme-choice]');
     if(nav) trackEvent('nav_click', { target: nav.getAttribute('href'), label: nav.textContent.trim().slice(0, 40) });
     if(add){ const original = add.textContent; addToWatchlist(add.dataset.add); add.textContent='✓'; setTimeout(()=>{ add.textContent = original; },800); }
     if(rem) removeFromWatchlist(rem.dataset.remove);
     if(hero) { const anime = findAnime(hero.dataset.hero); renderHero(anime); trackEvent('recommendation_candidate_open', animePayload(anime)); $('#top').scrollIntoView({behavior:'smooth'}); }
+    if(filter){ currentWatchFilter = filter.dataset.watchFilter; renderWatchlist(); }
+    if(status){ setWatchStatus(status.dataset.watchId, status.dataset.watchStatus); }
+    if(share) shareResult();
+    if(download) downloadResultImage();
+    if(themeChoice){ if(themeChoice.dataset.themeChoice === 'dark') setTheme('dark'); localStorage.setItem('anipick-theme-nudge-v1','seen'); $('#themeNudge')?.classList.add('hidden'); }
   });
 }
 
 function init(){
-  const themeVersion = 'red-white-v1';
-  if(localStorage.getItem('anipick-theme-version') !== themeVersion){
-    localStorage.setItem('anipick-theme-version', themeVersion);
-    localStorage.setItem('anipick-theme', 'light');
-  }
-  setTheme(localStorage.getItem('anipick-theme') || 'light', { silent: true });
-  renderProfiles(); initHeroVisuals(); renderHero(); renderMoodPickBanner(); renderSurveyQuestion(); renderSurveyResult(); renderGrid(); renderWatchlist(); bindEvents();
+  const themeVersion = 'deep-navy-v2';
+  if(localStorage.getItem('anipick-theme-version') !== themeVersion){ localStorage.setItem('anipick-theme-version', themeVersion); }
+  setTheme(preferredTheme(), { silent: true });
+  renderProfiles(); initHeroVisuals(); renderHero(); renderMoodPickBanner(); renderSurveyQuestion(); renderSurveyResult(); renderGrid(); renderWatchlist(); bindEvents(); maybeShowThemeNudge(); initScrollMotion();
 }
 document.addEventListener('DOMContentLoaded', init);
