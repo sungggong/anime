@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ko" data-theme="dark" class="scroll-smooth">
+<html lang="ko" data-theme="light" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="차분한 신사 배경과 세련된 OTT 카드 UI로 취향에 맞는 애니를 추천하는 AniPick." />
-  <title>AniPick | 차분하게 고르는 애니 추천</title>
+  <meta name="description" content="빨간색과 하얀색을 중심으로 한 세련되고 읽기 쉬운 애니 추천 사이트 AniPick." />
+  <title>AniPick | 빨간색과 하얀색의 애니 추천</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -21,7 +21,7 @@
             mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
           },
           colors: {
-            ink: '#08090a', panel: '#0f1011', surface: '#191a1b', accent: '#8b5cf6'
+            ink: '#171717', panel: '#ffffff', surface: '#fff7f7', accent: '#e11d2e'
           },
           boxShadow: { card: '0 28px 90px rgba(0,0,0,.38)' }
         }
@@ -55,13 +55,13 @@
         <a class="nav-link" href="#survey">설문 추천</a>
         <a class="nav-link" href="#recommend">추천작</a>
         <a class="nav-link" href="#watchlist">찜 목록</a>
-        <button id="themeToggle" class="control-pill" type="button" aria-label="다크/라이트 모드 변경">🌙 Dark</button>
+        <button id="themeToggle" class="control-pill" type="button" aria-label="다크/라이트 모드 변경">☀️ Light</button>
       </div>
     </nav>
     <div id="mobileMenu" class="hidden border-t border-[var(--line)] bg-[var(--panel)] px-5 py-4 md:hidden">
       <div class="flex flex-col gap-4 text-sm font-bold">
         <a href="#profiles">프로필</a><a href="#survey">설문 추천</a><a href="#recommend">추천작</a><a href="#watchlist">찜 목록</a>
-        <button id="themeToggleMobile" class="control-pill w-fit" type="button">🌙 Dark</button>
+        <button id="themeToggleMobile" class="control-pill w-fit" type="button">☀️ Light</button>
       </div>
     </div>
   </header>
@@ -69,11 +69,11 @@
   <main id="top" class="relative z-10">
     <section class="mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 lg:grid-cols-[1.02fr_.98fr] lg:px-8 lg:py-24">
       <div>
-        <p class="kicker">quiet anime recommendation</p>
+        <p class="kicker">red & white anime recommendation</p>
         <h1 class="font-kr text-5xl font-black leading-[1.03] tracking-[-0.06em] sm:text-6xl lg:text-7xl">
-          오늘 볼 애니를<br /><span class="accent-text">차분하고 정확하게</span> 골라요.
+          오늘 볼 애니를<br /><span class="accent-text">선명하고 세련되게</span> 골라요.
         </h1>
-        <p class="mt-7 max-w-2xl text-lg leading-8 text-[var(--muted)]">과한 장식은 덜어내고, 밤의 신사 실루엣처럼 고요한 분위기에서 취향 프로필과 간단한 설문으로 감상 후보를 추천합니다.</p>
+        <p class="mt-7 max-w-2xl text-lg leading-8 text-[var(--muted)]">배경은 뒤로 물리고 본문은 하얀 여백 위에 또렷하게 배치했습니다. 빨간 포인트와 깔끔한 카드 UI로 취향 프로필과 간단한 설문 추천을 편하게 확인하세요.</p>
         <div class="mt-9 flex flex-col gap-3 sm:flex-row">
           <a class="btn-primary" href="#survey">개인화 설문 시작</a>
           <button id="randomHeroButton" class="btn-secondary" type="button">랜덤 추천</button>

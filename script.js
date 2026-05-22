@@ -134,7 +134,12 @@ function bindEvents(){
 }
 
 function init(){
-  setTheme(localStorage.getItem('anipick-theme') || 'dark', { silent: true });
+  const themeVersion = 'red-white-v1';
+  if(localStorage.getItem('anipick-theme-version') !== themeVersion){
+    localStorage.setItem('anipick-theme-version', themeVersion);
+    localStorage.setItem('anipick-theme', 'light');
+  }
+  setTheme(localStorage.getItem('anipick-theme') || 'light', { silent: true });
   renderProfiles(); renderHero(); renderSurveyResult(); renderGrid(); renderWatchlist(); bindEvents();
 }
 document.addEventListener('DOMContentLoaded', init);
