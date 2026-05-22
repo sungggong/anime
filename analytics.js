@@ -15,6 +15,7 @@
   const state = { ready: false, queue: [] };
 
   function getSessionId() {
+    if (!hasConsent()) return 'not-consented';
     let id = localStorage.getItem(sessionKey);
     if (!id) {
       id = `ap_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
@@ -60,7 +61,7 @@
     banner.innerHTML = `
       <div>
         <strong>방문 분석 안내</strong>
-        <p>사이트 개선을 위해 익명 방문/클릭/설문 선택 이벤트를 수집할 수 있어요. 이름, 연락처 같은 개인정보는 수집하지 않습니다.</p>
+        <p>사이트 개선을 위해 동의 후에만 익명 방문/클릭/설문 선택 이벤트를 수집할 수 있어요. 이름, 연락처, 자유 입력 개인정보는 수집하지 않습니다.</p>
       </div>
       <div class="analytics-consent-actions">
         <button type="button" data-analytics-consent="denied">거절</button>
@@ -126,7 +127,7 @@
   function send(name, params = {}) {
     const payload = normalizeParams(params);
     if (!config.enabled || !hasConsent()) {
-      state.queue.push({ name, params: payload });
+      // Privacy-first: do not persist or queue behavior events before explicit consent.
       return;
     }
 

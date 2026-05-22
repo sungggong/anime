@@ -146,25 +146,6 @@
 }
   </script>
 
-  <!-- Google tag (gtag.js) with Consent Mode defaults -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZQ8WZ0SKF4"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('consent', 'default', {
-      analytics_storage: 'denied',
-      ad_storage: 'denied',
-      ad_user_data: 'denied',
-      ad_personalization: 'denied',
-      wait_for_update: 500
-    });
-    gtag('js', new Date());
-    gtag('config', 'G-ZQ8WZ0SKF4', {
-      anonymize_ip: true,
-      send_page_view: false
-    });
-  </script>
-
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
@@ -211,7 +192,8 @@
       <button id="menuButton" class="rounded-full border border-[var(--line)] px-4 py-2 text-sm font-bold md:hidden" type="button" aria-expanded="false" aria-controls="mobileMenu">메뉴</button>
       <div class="hidden items-center gap-6 text-sm font-semibold md:flex">
         <a class="nav-link" href="#profiles">프로필</a>
-        <a class="nav-link" href="#survey">설문 추천</a>
+        <a class="nav-link" href="#survey">카드 설문</a>
+        <a class="nav-link" href="#mood-pick">오늘의 픽</a>
         <a class="nav-link" href="#recommend">추천작</a>
         <a class="nav-link" href="#watchlist">찜 목록</a>
         <button id="themeToggle" class="control-pill" type="button" aria-label="다크/라이트 모드 변경">☀️ Light</button>
@@ -219,26 +201,35 @@
     </nav>
     <div id="mobileMenu" class="hidden border-t border-[var(--line)] bg-[var(--panel)] px-5 py-4 md:hidden">
       <div class="flex flex-col gap-4 text-sm font-bold">
-        <a href="#profiles">프로필</a><a href="#survey">설문 추천</a><a href="#recommend">추천작</a><a href="#watchlist">찜 목록</a>
+        <a href="#profiles">프로필</a><a href="#survey">카드 설문</a><a href="#mood-pick">오늘의 픽</a><a href="#recommend">추천작</a><a href="#watchlist">찜 목록</a>
         <button id="themeToggleMobile" class="control-pill w-fit" type="button">☀️ Light</button>
       </div>
     </div>
   </header>
 
   <main id="top" class="relative z-10">
-    <section class="mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 lg:grid-cols-[1.02fr_.98fr] lg:px-8 lg:py-24">
-      <div>
-        <p class="kicker">red & white anime recommendation</p>
-        <h1 class="font-kr text-5xl font-black leading-[1.03] tracking-[-0.06em] sm:text-6xl lg:text-7xl">
-          오늘 볼 애니를<br /><span class="accent-text">선명하고 세련되게</span> 골라요.
-        </h1>
-        <p class="mt-7 max-w-2xl text-lg leading-8 text-[var(--muted)]">배경은 뒤로 물리고 본문은 하얀 여백 위에 또렷하게 배치했습니다. 빨간 포인트와 깔끔한 카드 UI로 취향 프로필과 간단한 설문 추천을 편하게 확인하세요.</p>
-        <div class="mt-9 flex flex-col gap-3 sm:flex-row">
-          <a class="btn-primary" href="#survey">개인화 설문 시작</a>
-          <button id="randomHeroButton" class="btn-secondary" type="button">랜덤 추천</button>
+    <section class="hero-visual relative overflow-hidden">
+      <div id="heroBackdrop" class="hero-backdrop" aria-hidden="true"></div>
+      <div class="hero-overlay" aria-hidden="true"></div>
+      <div class="hero-inner mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 lg:grid-cols-[1.02fr_.98fr] lg:px-8 lg:py-24">
+        <div>
+          <p class="kicker">cinematic anime recommendation</p>
+          <h1 class="font-kr text-5xl font-black leading-[1.03] tracking-[-0.06em] sm:text-6xl lg:text-7xl">
+            오늘 볼 애니를<br /><span class="accent-text">분위기까지 맞춰</span> 골라요.
+          </h1>
+          <p class="mt-7 max-w-2xl text-lg leading-8 text-[var(--muted)]">인기 애니 키비주얼이 은은하게 흐르는 히어로, 카드형 취향 설문, 개인화 추천 이유까지 한 화면에서 확인하세요. 개인정보는 저장하지 않고, 방문 분석은 동의한 경우에만 익명 이벤트로 처리합니다.</p>
+          <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+            <a class="btn-primary" href="#survey">카드 설문 시작</a>
+            <button id="randomHeroButton" class="btn-secondary" type="button">랜덤 추천</button>
+          </div>
+          <div id="heroPosterRail" class="hero-poster-rail mt-8" aria-label="인기 애니 포스터 슬라이드"></div>
         </div>
+        <article id="heroPick" class="glass-card p-5 lg:p-6"></article>
       </div>
-      <article id="heroPick" class="glass-card p-5 lg:p-6"></article>
+    </section>
+
+    <section id="mood-pick" class="mx-auto max-w-7xl px-5 pb-8 pt-8 lg:px-8" aria-labelledby="moodPickTitle">
+      <article id="moodPickBanner" class="mood-pick-banner glass-card p-6 lg:p-7"></article>
     </section>
 
     <section class="mx-auto max-w-7xl px-5 pb-8 lg:px-8" aria-labelledby="seoIntroTitle">
@@ -273,13 +264,15 @@
         <div class="glass-card p-6 lg:p-8">
           <p class="kicker">personal taste quiz</p>
           <h2 class="section-title">개인 맞춤 설문 추천</h2>
-          <p class="mt-3 text-[var(--muted)]">아래 답변을 고르면 장르, 감정선, 시청 시간, 분위기 선호도를 점수화해서 가장 잘 맞는 애니를 추천합니다.</p>
-          <form id="surveyForm" class="mt-7 space-y-6">
-            <fieldset><legend>1. 오늘 원하는 감정은?</legend><div class="choice-grid"><label><input type="radio" name="mood" value="power" checked /> 에너지/액션</label><label><input type="radio" name="mood" value="comfort" /> 힐링/여운</label><label><input type="radio" name="mood" value="heart" /> 설렘/로맨스</label><label><input type="radio" name="mood" value="brain" /> 추리/반전</label></div></fieldset>
-            <fieldset><legend>2. 보고 싶은 세계관은?</legend><div class="choice-grid"><label><input type="radio" name="world" value="modern" checked /> 현대/학교</label><label><input type="radio" name="world" value="fantasy" /> 판타지/이세계</label><label><input type="radio" name="world" value="japan" /> 일본풍/시대극</label><label><input type="radio" name="world" value="sf" /> SF/미래</label></div></fieldset>
-            <fieldset><legend>3. 선호하는 호흡은?</legend><div class="choice-grid"><label><input type="radio" name="pace" value="fast" checked /> 빠른 전개</label><label><input type="radio" name="pace" value="slow" /> 천천히 몰입</label><label><input type="radio" name="pace" value="balanced" /> 균형 잡힌 전개</label></div></fieldset>
-            <fieldset><legend>4. 오늘 볼 시간은?</legend><div class="choice-grid"><label><input type="radio" name="length" value="short" checked /> 짧게 맛보기</label><label><input type="radio" name="length" value="medium" /> 주말 정주행</label><label><input type="radio" name="length" value="long" /> 긴 서사 환영</label></div></fieldset>
-            <button class="btn-primary w-full" type="submit">내 취향 추천 계산하기</button>
+          <p class="mt-3 text-[var(--muted)]">질문을 하나씩 넘기는 카드 스와이프 UX로 바꿨습니다. 선택값은 브라우저 안에서만 계산하며 서버로 저장하지 않습니다.</p>
+          <form id="surveyForm" class="survey-deck mt-7" autocomplete="off">
+            <div class="survey-progress" aria-live="polite"><span id="surveyProgressBar"></span></div>
+            <p id="surveyProgressText" class="mt-3 text-sm font-black text-[var(--accent)]">1 / 4</p>
+            <div id="surveyQuestionCard" class="survey-question-card" role="group" aria-label="취향 설문 질문"></div>
+            <div class="mt-4 flex items-center justify-between gap-3">
+              <button id="surveyBackButton" class="btn-secondary" type="button">이전</button>
+              <button id="surveyResetButton" class="btn-secondary" type="button">다시 선택</button>
+            </div>
           </form>
         </div>
         <article id="surveyResult" class="glass-card result-card p-6 lg:p-8"></article>

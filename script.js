@@ -109,6 +109,20 @@ const profiles = [
 ];
 
 const genreLabels = { action:'액션', healing:'힐링', romance:'로맨스', mystery:'미스터리', fantasy:'판타지' };
+const moodLabels = { power:'에너지/액션', comfort:'힐링/여운', heart:'설렘/로맨스', brain:'추리/반전' };
+const worldLabels = { modern:'현대/학교', fantasy:'판타지/이세계', japan:'일본풍/시대극', sf:'SF/미래' };
+const paceLabels = { fast:'빠른 전개', slow:'천천히 몰입', balanced:'균형 잡힌 전개' };
+const lengthLabels = { short:'짧게 맛보기', medium:'주말 정주행', long:'긴 서사 환영' };
+const surveyQuestions = [
+  { key:'mood', eyebrow:'오늘 기분', title:'지금 끌리는 감정은?', options:[{ value:'power', label:'에너지/액션', detail:'속도감 있는 전투와 카타르시스' },{ value:'comfort', label:'힐링/여운', detail:'마음이 천천히 풀리는 감정선' },{ value:'heart', label:'설렘/로맨스', detail:'관계 변화와 따뜻한 떨림' },{ value:'brain', label:'추리/반전', detail:'생각할수록 깊어지는 긴장감' }]},
+  { key:'world', eyebrow:'세계관', title:'어떤 배경에 들어가고 싶나요?', options:[{ value:'modern', label:'현대/학교', detail:'익숙한 일상 속 특별한 사건' },{ value:'fantasy', label:'판타지/이세계', detail:'마법, 모험, 거대한 세계관' },{ value:'japan', label:'일본풍/시대극', detail:'검, 요괴, 전통적인 분위기' },{ value:'sf', label:'SF/미래', detail:'시간, 우주, 기술의 상상력' }]},
+  { key:'pace', eyebrow:'호흡', title:'전개 속도는 어느 쪽이 좋나요?', options:[{ value:'fast', label:'빠른 전개', detail:'바로 몰입되는 에피소드' },{ value:'slow', label:'천천히 몰입', detail:'감정과 복선을 차근차근' },{ value:'balanced', label:'균형 잡힌 전개', detail:'액션과 서사의 안정적인 밸런스' }]},
+  { key:'length', eyebrow:'시청 시간', title:'오늘 확보한 시간은?', options:[{ value:'short', label:'짧게 맛보기', detail:'가볍게 시작하기 좋은 분량' },{ value:'medium', label:'주말 정주행', detail:'몰입해서 달리기 좋은 길이' },{ value:'long', label:'긴 서사 환영', detail:'세계관에 오래 머무는 장편' }]},
+];
+const defaultSurveyAnswers = { mood:'power', world:'modern', pace:'fast', length:'short' };
+let surveyAnswers = { ...defaultSurveyAnswers };
+let surveyStep = 0;
+let heroBackdropTimer;
 let currentFilter = 'all';
 let activeProfile = localStorage.getItem('anipick-profile') || 'solo';
 let watchlist = JSON.parse(localStorage.getItem('anipick-watchlist-v2') || '[]');
@@ -120,6 +134,22 @@ const findAnime = id => animeList.find(anime => anime.id === id);
 
 function saveWatchlist(){ localStorage.setItem('anipick-watchlist-v2', JSON.stringify(watchlist)); }
 function animeStyle(anime){ return `--p1:${anime.palette?.[0] || '#8b5cf6'};--p2:${anime.palette?.[1] || '#38bdf8'};`; }
+function malScore(anime){ return (anime.score / 10).toFixed(1); }
+function episodeLabel(anime){ return { short:'약 12화/극장판', medium:'약 24화 전후', long:'장편·시리즈' }[anime.length] || '정보 확인 중'; }
+function reasonForAnime(anime, answers = surveyAnswers){
+  const profile = profiles.find(p=>p.id===activeProfile);
+  const matches = [];
+  if(anime.mood === answers.mood) matches.push(moodLabels[answers.mood]);
+  if(anime.pace === answers.pace) matches.push(paceLabels[answers.pace]);
+  if(anime.world === answers.world) matches.push(worldLabels[answers.world]);
+  if(anime.length === answers.length) matches.push(lengthLabels[answers.length]);
+  if(!matches.length) matches.push(`${profile.name} 프로필`);
+  const percent = Math.min(96, Math.round((scoreAnime(anime, answers) / 170) * 100));
+  return `${matches.slice(0,2).join(' + ')} 응답과 ${percent}% 일치 · '${profile.name}'에 최적화`;
+}
+function preview(anime){
+  return `<div class="preview-popover" role="status"><p class="kicker !mb-2">quick preview</p><h4 class="font-kr text-xl font-black">${anime.title}</h4><p class="mt-2 text-sm leading-6 text-white/78">${anime.summary}</p><div class="preview-meta"><span>MAL ${malScore(anime)}</span><span>${episodeLabel(anime)}</span><span>${genreLabels[anime.genre]}</span>${anime.tags.slice(0,2).map(tag=>`<span>${tag}</span>`).join('')}</div></div>`;
+}
 function poster(anime){
   return `<div class="poster real-poster" style="${animeStyle(anime)}" data-symbol="${anime.symbol}">
     <img src="${anime.image}" alt="${anime.title} 공식 커버 이미지" loading="lazy" referrerpolicy="no-referrer" />
@@ -139,7 +169,24 @@ function animePayload(anime){
 }
 
 function renderHero(anime = recommendByProfile()[0]?.anime || pickRandom()){
-  $('#heroPick').innerHTML = `${poster(anime)}<div class="mt-5 flex items-start justify-between gap-4"><div><p class="kicker">today's quiet pick</p><h2 class="font-kr text-3xl font-black">${anime.title}</h2></div>${addButton(anime.id)}</div><p class="mt-4 leading-7 text-[var(--muted)]">${anime.summary}</p><p class="mt-4 rounded-2xl border border-[var(--line)] bg-black/10 p-4 text-sm leading-6">추천 이유: ${anime.reason}</p>`;
+  $('#heroPick').innerHTML = `${poster(anime)}<div class="mt-5 flex items-start justify-between gap-4"><div><p class="kicker">today's visual pick</p><h2 class="font-kr text-3xl font-black">${anime.title}</h2></div>${addButton(anime.id)}</div><p class="mt-4 leading-7 text-[var(--muted)]">${anime.summary}</p><p class="mt-4 rounded-2xl border border-[var(--line)] bg-black/10 p-4 text-sm leading-6">추천 이유: ${reasonForAnime(anime)}</p>`;
+  updateHeroBackdrop(anime);
+}
+function updateHeroBackdrop(anime){ const backdrop = $('#heroBackdrop'); if(backdrop) backdrop.style.setProperty('--hero-image', `url('${anime.image}')`); }
+function initHeroVisuals(){
+  const top = animeList.slice(0, 10); const rail = $('#heroPosterRail');
+  if(rail) rail.innerHTML = top.map((anime, index)=>`<img class="hero-rail-poster ${index===0?'active':''}" src="${anime.image}" alt="${anime.title} 포스터" loading="lazy" />`).join('');
+  let index = 0; updateHeroBackdrop(top[index]); clearInterval(heroBackdropTimer);
+  heroBackdropTimer = setInterval(()=>{ index = (index + 1) % top.length; updateHeroBackdrop(top[index]); $$('.hero-rail-poster').forEach((img, i)=>img.classList.toggle('active', i===index)); }, 3000);
+}
+function dailyMoodPick(){
+  const now = new Date(); const day = now.getDay(); const slot = now.getHours() < 12 ? 'morning' : now.getHours() < 18 ? 'day' : 'night';
+  const map = {'0-night':'violet','1-night':'frieren','2-night':'steins-gate','3-night':'spy-family','4-night':'kaguya','5-night':'jjk','6-night':'haikyu','0-day':'one-piece','1-day':'bocchi','2-day':'apothecary','3-day':'mob-psycho','4-day':'your-lie','5-day':'demon-slayer','6-day':'cowboy-bebop'};
+  const id = map[`${day}-${slot}`] || map[`${day}-day`] || 'frieren'; return findAnime(id) || animeList[day % animeList.length];
+}
+function renderMoodPickBanner(){
+  const anime = dailyMoodPick(); const dayText = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'][new Date().getDay()]; const hour = new Date().getHours(); const timeText = hour < 12 ? '아침' : hour < 18 ? '오후' : '밤';
+  $('#moodPickBanner').innerHTML = `<div><p class="kicker">daily mood pick</p><h2 id="moodPickTitle" class="font-kr text-3xl font-black">오늘은 ${dayText} ${timeText}, 이 한 편 어때요?</h2><p class="mt-3 leading-7 text-[var(--muted)]">${anime.title} · ${anime.reason}</p><p class="recommend-reason mt-4">${reasonForAnime(anime)} / 날짜와 시간대만 브라우저에서 계산하며 개인 정보는 전송하지 않습니다.</p><div class="mt-5 flex flex-wrap gap-3"><button class="btn-primary" type="button" data-hero="${anime.id}">오늘의 픽 자세히 보기</button>${addButton(anime.id, '＋ 찜')}</div></div><img class="mood-pick-thumb" src="${anime.image}" alt="${anime.title} 포스터" loading="lazy" />`;
 }
 
 function renderProfiles(){
@@ -159,24 +206,35 @@ function scoreAnime(anime, answers){
   Object.entries(profile.prefer).forEach(([key,value]) => { if(anime[key] === value) score += 10; });
   return score;
 }
-function getAnswers(){ return Object.fromEntries(new FormData($('#surveyForm')).entries()); }
+function getAnswers(){ return { ...surveyAnswers }; }
+function renderSurveyQuestion(){
+  const q = surveyQuestions[surveyStep];
+  $('#surveyProgressText').textContent = `${surveyStep + 1} / ${surveyQuestions.length}`;
+  $('#surveyProgressBar').style.width = `${((surveyStep + 1) / surveyQuestions.length) * 100}%`;
+  $('#surveyBackButton').disabled = surveyStep === 0;
+  $('#surveyQuestionCard').classList.remove('slide-out');
+  $('#surveyQuestionCard').innerHTML = `<p class="kicker">${q.eyebrow}</p><h3 class="font-kr text-3xl font-black">${q.title}</h3><p class="privacy-note mt-4">선택값은 추천 계산에만 쓰이며, 동의 전에는 분석 이벤트로 보내지 않습니다.</p><div class="survey-option-grid">${q.options.map(option=>`<button class="survey-option" type="button" data-survey-key="${q.key}" data-survey-value="${option.value}">${option.label}<small>${option.detail}</small></button>`).join('')}</div>`;
+}
+function completeSurvey(){ const result = renderSurveyResult(surveyAnswers, true); trackEvent('survey_submit', Object.assign({}, surveyAnswers, { match_percent: result.percent }, animePayload(result.top.anime))); $('#surveyResult').scrollIntoView({behavior:'smooth', block:'center'}); }
+function selectSurveyAnswer(key, value){ surveyAnswers[key] = value; $('#surveyQuestionCard').classList.add('slide-out'); setTimeout(()=>{ if(surveyStep < surveyQuestions.length - 1){ surveyStep += 1; renderSurveyQuestion(); } else { renderSurveyQuestion(); completeSurvey(); } }, 230); }
+function resetSurvey(){ surveyAnswers = { ...defaultSurveyAnswers }; surveyStep = 0; renderSurveyQuestion(); renderSurveyResult(surveyAnswers); }
 function recommendByProfile(){
   const profile = profiles.find(p=>p.id===activeProfile);
   const defaults = { mood: profile.prefer.mood || 'comfort', world: profile.prefer.world || 'modern', pace: profile.prefer.pace || 'balanced', length: profile.prefer.length || 'medium' };
   return animeList.map(anime => ({ anime, score: scoreAnime(anime, defaults) })).sort((a,b)=>b.score-a.score);
 }
-function renderSurveyResult(answers = null){
+function renderSurveyResult(answers = null, animated = false){
   const selected = answers || getAnswers();
   const ranked = animeList.map(anime => ({ anime, score: scoreAnime(anime, selected) })).sort((a,b)=>b.score-a.score);
   const top = ranked[0];
   const percent = Math.min(99, Math.round((top.score / 170) * 100));
-  $('#surveyResult').innerHTML = `<p class="kicker">your best match</p><div class="grid gap-6 md:grid-cols-[.82fr_1fr] md:items-center">${poster(top.anime)}<div><h3 class="font-kr text-3xl font-black">${top.anime.title}</h3><p class="mt-3 text-[var(--muted)]">${top.anime.summary}</p><div class="mt-5"><div class="mb-2 flex justify-between text-sm font-black"><span>취향 매칭률</span><span>${percent}%</span></div><div class="match-meter"><span style="width:${percent}%"></span></div></div><p class="mt-4 rounded-2xl border border-[var(--line)] bg-black/10 p-4 text-sm leading-6">${top.anime.reason}</p>${addButton(top.anime.id, '＋ 찜')}</div></div><div class="mt-6 grid gap-3 sm:grid-cols-2">${ranked.slice(1,5).map(({anime,score})=>`<button class="watch-card text-left" data-hero="${anime.id}" type="button"><strong>${anime.title}</strong><small class="mt-1 block text-[var(--muted)]">후보 점수 ${score}</small></button>`).join('')}</div>`;
+  $('#surveyResult').innerHTML = `<p class="kicker">your best match</p><div class="grid gap-6 md:grid-cols-[.82fr_1fr] md:items-center ${animated?'animate-pulse':''}">${poster(top.anime)}<div><h3 class="font-kr text-3xl font-black">${top.anime.title}</h3><p class="mt-3 text-[var(--muted)]">${top.anime.summary}</p><div class="mt-5"><div class="mb-2 flex justify-between text-sm font-black"><span>취향 매칭률</span><span>${percent}%</span></div><div class="match-meter"><span style="width:${percent}%"></span></div></div><p class="recommend-reason mt-4">${reasonForAnime(top.anime, selected)}</p><p class="mt-3 rounded-2xl border border-[var(--line)] bg-black/10 p-4 text-sm leading-6">${top.anime.reason}</p>${addButton(top.anime.id, '＋ 찜')}</div></div><div class="mt-6 grid gap-3 sm:grid-cols-2">${ranked.slice(1,5).map(({anime,score})=>`<button class="watch-card text-left" data-hero="${anime.id}" type="button"><strong>${anime.title}</strong><small class="mt-1 block text-[var(--muted)]">후보 점수 ${score} · ${reasonForAnime(anime, selected)}</small></button>`).join('')}</div>`;
   return { top, percent, selected };
 }
 
 function renderGrid(){
   const items = currentFilter === 'all' ? animeList : animeList.filter(anime => anime.genre === currentFilter);
-  $('#animeGrid').innerHTML = items.map(anime => `<article class="anime-card">${poster(anime)}<div class="p-3"><div class="mt-1 flex items-start justify-between gap-4"><div><p class="text-xs font-black uppercase tracking-[.2em] text-[var(--accent)]">${genreLabels[anime.genre]}</p><h3 class="mt-1 font-kr text-xl font-black">${anime.title}</h3></div>${addButton(anime.id)}</div><p class="mt-3 min-h-[4.5rem] text-sm leading-6 text-[var(--muted)]">${anime.summary}</p></div></article>`).join('');
+  $('#animeGrid').innerHTML = items.map(anime => `<article class="anime-card" tabindex="0">${preview(anime)}${poster(anime)}<div class="p-3"><div class="mt-1 flex items-start justify-between gap-4"><div><p class="text-xs font-black uppercase tracking-[.2em] text-[var(--accent)]">${genreLabels[anime.genre]}</p><h3 class="mt-1 font-kr text-xl font-black">${anime.title}</h3></div>${addButton(anime.id)}</div><p class="mt-3 min-h-[4.5rem] text-sm leading-6 text-[var(--muted)]">${anime.summary}</p><p class="recommend-reason mt-3">${reasonForAnime(anime)}</p></div></article>`).join('');
 }
 function renderWatchlist(){
   const items = watchlist.map(findAnime).filter(Boolean);
@@ -193,7 +251,9 @@ function bindEvents(){
   $$('#themeToggle,#themeToggleMobile').forEach(btn=>btn?.addEventListener('click', toggleTheme));
   $('#profileGrid').addEventListener('click', e => { const card = e.target.closest('[data-profile]'); if(!card) return; activeProfile = card.dataset.profile; localStorage.setItem('anipick-profile', activeProfile); renderProfiles(); renderSurveyResult(); renderHero(); trackEvent('profile_select', { profile: activeProfile }); });
   $$('.filter-chip').forEach(btn=>btn.addEventListener('click',()=>{ $$('.filter-chip').forEach(c=>c.classList.remove('active')); btn.classList.add('active'); currentFilter=btn.dataset.filter; renderGrid(); trackEvent('genre_filter', { filter: currentFilter }); }));
-  $('#surveyForm').addEventListener('submit', e => { e.preventDefault(); const answers = getAnswers(); const result = renderSurveyResult(answers); trackEvent('survey_submit', Object.assign({}, answers, { match_percent: result.percent }, animePayload(result.top.anime))); $('#surveyResult').scrollIntoView({behavior:'smooth', block:'center'}); });
+  $('#surveyForm').addEventListener('click', e => { const option = e.target.closest('[data-survey-key]'); if(option) selectSurveyAnswer(option.dataset.surveyKey, option.dataset.surveyValue); });
+  $('#surveyBackButton').addEventListener('click',()=>{ if(surveyStep > 0){ surveyStep -= 1; renderSurveyQuestion(); } });
+  $('#surveyResetButton').addEventListener('click', resetSurvey);
   $('#randomHeroButton').addEventListener('click',()=>{ const anime = pickRandom(); renderHero(anime); trackEvent('random_pick', animePayload(anime)); });
   $('#clearWatchlist').addEventListener('click',()=>{ const count = watchlist.length; watchlist=[]; saveWatchlist(); renderWatchlist(); trackEvent('watchlist_clear', { removed_count: count }); });
   document.body.addEventListener('click', e => {
@@ -212,6 +272,6 @@ function init(){
     localStorage.setItem('anipick-theme', 'light');
   }
   setTheme(localStorage.getItem('anipick-theme') || 'light', { silent: true });
-  renderProfiles(); renderHero(); renderSurveyResult(); renderGrid(); renderWatchlist(); bindEvents();
+  renderProfiles(); initHeroVisuals(); renderHero(); renderMoodPickBanner(); renderSurveyQuestion(); renderSurveyResult(); renderGrid(); renderWatchlist(); bindEvents();
 }
 document.addEventListener('DOMContentLoaded', init);
