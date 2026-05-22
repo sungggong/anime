@@ -535,6 +535,41 @@ html[data-theme='dark'] .ad-slot { background: linear-gradient(135deg, rgba(var(
 .survey-option { width: 100%; border: 0; border-radius: 1rem; background: var(--panel); color: var(--text); box-shadow: var(--ring-shadow); padding: 1rem; text-align: left; font-weight: 900; transition: transform .2s ease, box-shadow .2s ease, background .2s ease; }
 .survey-option:hover, .survey-option:focus-visible { transform: translateX(.3rem); background: rgba(var(--accent-rgb), .075); box-shadow: rgba(var(--accent-rgb), .34) 0 0 0 1px, rgba(var(--accent-rgb), .14) 0 18px 42px -24px; }
 .survey-option small { display: block; margin-top: .3rem; color: var(--muted); font-weight: 700; line-height: 1.45; }
+.plot-line,
+.candidate-plot,
+.shelf-plot {
+  display: block;
+  border-radius: 1rem;
+  border: 1px solid rgba(var(--accent-rgb), .13);
+  background: linear-gradient(135deg, rgba(var(--accent-rgb), .075), rgba(255,255,255,.035));
+  color: var(--muted);
+  padding: .82rem .9rem;
+  font-size: .9rem;
+  font-weight: 760;
+  line-height: 1.65;
+}
+.plot-line span {
+  display: block;
+  margin-bottom: .22rem;
+  color: var(--accent);
+  font-size: .68rem;
+  font-weight: 950;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.candidate-plot,
+.shelf-plot {
+  margin-top: .55rem;
+  padding: .62rem .72rem;
+  font-size: .78rem;
+  line-height: 1.55;
+}
+html[data-theme='dark'] .plot-line,
+html[data-theme='dark'] .candidate-plot,
+html[data-theme='dark'] .shelf-plot {
+  background: linear-gradient(135deg, rgba(var(--accent-rgb), .14), rgba(255,255,255,.045));
+  color: rgba(255,255,255,.78);
+}
 .recommend-reason { border-radius: .85rem; background: rgba(var(--accent-rgb), .065); color: var(--accent-2); padding: .72rem .82rem; font-size: .82rem; font-weight: 800; line-height: 1.5; }
 html[data-theme='dark'] .recommend-reason { color: #ffd8dc; }
 .answer-chip-strip { display: flex; flex-wrap: wrap; gap: .42rem; }
