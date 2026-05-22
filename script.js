@@ -248,63 +248,80 @@ const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
 const pickRandom = (items = animeList) => items[Math.floor(Math.random() * items.length)];
 const findAnime = id => animeList.find(anime => anime.id === id);
+const surveyScoreCache = new Map();
+const signalCache = new Map();
+const maxScoreCacheEntries = 800;
+const scoringKeys = ['genre','mood','world','pace','length','intensity','tone','focus','era'];
+const scoreWeights = { base:40, genre:24, mood:34, world:22, pace:18, length:16, intensity:18, tone:18, focus:22, era:16, profile:24 };
+const scoreMax = Object.values(scoreWeights).reduce((a,b)=>a+b,0);
+const breakdownLabels = { genre:'장르', mood:'감정', world:'세계관', pace:'전개', length:'분량', intensity:'강도', tone:'분위기', focus:'중점 재미', era:'작품 감성' };
+const relatedTone = { bright:['emotional'], emotional:['bright','epic'], dark:['epic'], epic:['dark','emotional'] };
+const relatedFocus = { battle:['character'], character:['battle','worldbuilding'], story:['worldbuilding'], romance:['character'], worldbuilding:['story','character'] };
+const signalKeywords = {
+  battle:['액션','전투','배틀','고어','히어로','스포츠','검','악마','헌터','닌자','축구','농구','배구'],
+  story:['미스터리','반전','추리','심리','서스펜스','타임','정치','진실','복선'],
+  romance:['로맨스','설렘','청춘','고백','감정선','삼각관계'],
+  world:['판타지','모험','이세계','세계관','우주','SF','마법','해적','요괴'],
+  emotional:['힐링','감동','여운','음악','편지','가족','드라마'],
+  dark:['다크','고어','호러','전쟁','복수','스릴러','악마','거인','죽음','심리'],
+  comedy:['코미디','유쾌','일상','가족','밴드'],
+  classic:['슬램덩크','유유백서','드래곤볼','세일러 문','카드캡터','아키라','토토로','라퓨타','공각기동대','퍼펙트 블루','카우보이 비밥'],
+  movie:['극장판','너의 이름은','센과 치히로','목소리의 형태','아키라','파프리카','퍼펙트 블루','토토로','라퓨타','하울','모노노케','포뇨','날씨의 아이','스즈메','초속','언어의 정원','바람이 분다','늑대아이','썸머 워즈','괴물의 아이','미래의 미라이','벨']
+};
 
 function saveWatchlist(){ localStorage.setItem('anipick-watchlist-v2', JSON.stringify(watchlist)); localStorage.setItem('anipick-watch-status-v1', JSON.stringify(watchStatus)); }
+function clearScoreCache(){ surveyScoreCache.clear(); }
 function animeStyle(anime){ return `--p1:${anime.palette?.[0] || '#8b5cf6'};--p2:${anime.palette?.[1] || '#38bdf8'};`; }
 function malScore(anime){ return (anime.score / 10).toFixed(1); }
 function episodeLabel(anime){ return { short:'약 12화/극장판', medium:'약 24화 전후', long:'장편·시리즈' }[anime.length] || '정보 확인 중'; }
 function labelFor(key, value){ return answerLabelMaps[key]?.[value] || value || '상관없음'; }
+function animeSearchText(anime){ return anime._searchText || (anime._searchText = `${anime.title} ${(anime.tags || []).join(' ')} ${anime.summary || ''} ${anime.reason || ''}`.toLowerCase()); }
 function hasTag(anime, keywords){
-  const text = `${anime.title} ${(anime.tags || []).join(' ')} ${anime.summary || ''} ${anime.reason || ''}`.toLowerCase();
+  const text = animeSearchText(anime);
   return keywords.some(keyword => text.includes(keyword.toLowerCase()));
 }
 function deriveAnimeSignals(anime){
-  const battleTags = ['액션','전투','배틀','고어','히어로','스포츠','검','악마','헌터','닌자','축구','농구','배구'];
-  const storyTags = ['미스터리','반전','추리','심리','서스펜스','타임','정치','진실','복선'];
-  const romanceTags = ['로맨스','설렘','청춘','고백','감정선','삼각관계'];
-  const worldTags = ['판타지','모험','이세계','세계관','우주','SF','마법','해적','요괴'];
-  const emotionalTags = ['힐링','감동','여운','음악','편지','가족','드라마'];
-  const darkTags = ['다크','고어','호러','전쟁','복수','스릴러','악마','거인','죽음','심리'];
-  const comedyTags = ['코미디','유쾌','일상','가족','밴드'];
-  const classicTags = ['슬램덩크','유유백서','드래곤볼','세일러 문','카드캡터','아키라','토토로','라퓨타','공각기동대','퍼펙트 블루','카우보이 비밥'];
-  const movieTags = ['극장판','너의 이름은','센과 치히로','목소리의 형태','아키라','파프리카','퍼펙트 블루','토토로','라퓨타','하울','모노노케','포뇨','날씨의 아이','스즈메','초속','언어의 정원','바람이 분다','늑대아이','썸머 워즈','괴물의 아이','미래의 미라이','벨'];
-  const intensity = anime.pace === 'fast' || anime.mood === 'power' || hasTag(anime, battleTags.concat(darkTags)) ? 'strong' : anime.pace === 'slow' && anime.mood === 'comfort' ? 'soft' : 'medium';
-  const tone = hasTag(anime, darkTags) || anime.mood === 'brain' ? 'dark' : hasTag(anime, emotionalTags) || anime.mood === 'comfort' ? 'emotional' : anime.length === 'long' || hasTag(anime, ['대서사','장편','모험','해적','연금술사']) ? 'epic' : hasTag(anime, comedyTags) ? 'bright' : 'bright';
-  const focus = anime.genre === 'romance' || hasTag(anime, romanceTags) ? 'romance' : anime.genre === 'mystery' || hasTag(anime, storyTags) ? 'story' : anime.genre === 'fantasy' || hasTag(anime, worldTags) ? 'worldbuilding' : hasTag(anime, ['성장','팀워크','청춘','가족']) ? 'character' : 'battle';
-  const era = anime.length === 'short' && hasTag(anime, movieTags) ? 'movie' : hasTag(anime, classicTags) ? 'classic' : anime.id.startsWith('extra-') || anime.score >= 94 ? 'modernClassic' : 'recent';
-  return { genre:anime.genre, mood:anime.mood, world:anime.world, pace:anime.pace, length:anime.length, intensity, tone, focus, era };
+  if(signalCache.has(anime.id)) return signalCache.get(anime.id);
+  const intensity = anime.pace === 'fast' || anime.mood === 'power' || hasTag(anime, signalKeywords.battle.concat(signalKeywords.dark)) ? 'strong' : anime.pace === 'slow' && anime.mood === 'comfort' ? 'soft' : 'medium';
+  const tone = hasTag(anime, signalKeywords.dark) || anime.mood === 'brain' ? 'dark' : hasTag(anime, signalKeywords.emotional) || anime.mood === 'comfort' ? 'emotional' : anime.length === 'long' || hasTag(anime, ['대서사','장편','모험','해적','연금술사']) ? 'epic' : hasTag(anime, signalKeywords.comedy) ? 'bright' : 'bright';
+  const focus = anime.genre === 'romance' || hasTag(anime, signalKeywords.romance) ? 'romance' : anime.genre === 'mystery' || hasTag(anime, signalKeywords.story) ? 'story' : anime.genre === 'fantasy' || hasTag(anime, signalKeywords.world) ? 'worldbuilding' : hasTag(anime, ['성장','팀워크','청춘','가족']) ? 'character' : 'battle';
+  const era = anime.length === 'short' && hasTag(anime, signalKeywords.movie) ? 'movie' : hasTag(anime, signalKeywords.classic) ? 'classic' : anime.id.startsWith('extra-') || anime.score >= 94 ? 'modernClassic' : 'recent';
+  const signals = { genre:anime.genre, mood:anime.mood, world:anime.world, pace:anime.pace, length:anime.length, intensity, tone, focus, era };
+  signalCache.set(anime.id, signals);
+  return signals;
+}
+function scoreCacheKey(anime, answers){ return JSON.stringify([activeProfile, anime.id, scoringKeys.map(key=>answers[key] || null)]); }
+function rememberScore(cacheKey, details){
+  if(surveyScoreCache.size >= maxScoreCacheEntries) surveyScoreCache.clear();
+  surveyScoreCache.set(cacheKey, details);
+  return details;
 }
 function scoreAnimeDetailed(anime, answers = surveyAnswers){
+  const cacheKey = scoreCacheKey(anime, answers);
+  if(surveyScoreCache.has(cacheKey)) return surveyScoreCache.get(cacheKey);
   const signals = deriveAnimeSignals(anime);
   const profile = profiles.find(p=>p.id===activeProfile) || profiles[0];
   const breakdown = [];
-  const weights = { base:40, genre:24, mood:34, world:22, pace:18, length:16, intensity:18, tone:18, focus:22, era:16, profile:24 };
-  let score = Math.round((anime.score / 100) * weights.base);
-  breakdown.push({ key:'base', label:'작품 기본 평점', expected:'MAL/인기도 기반', actual:malScore(anime), points:score, max:weights.base });
-  ['genre','mood','world','pace','length','intensity','tone','focus','era'].forEach(key => {
+  let score = Math.round((anime.score / 100) * scoreWeights.base);
+  breakdown.push({ key:'base', label:'작품 기본 평점', expected:'MAL/인기도 기반', actual:malScore(anime), points:score, max:scoreWeights.base });
+  scoringKeys.forEach(key => {
     const expected = answers[key];
     const actual = signals[key];
-    const max = weights[key];
+    const max = scoreWeights[key];
     let points = actual === expected ? max : 0;
-    if(!points && key === 'tone'){
-      const relatedTone = { bright:['emotional'], emotional:['bright','epic'], dark:['epic'], epic:['dark','emotional'] };
-      if(relatedTone[expected]?.includes(actual)) points = Math.round(max * .45);
-    }
-    if(!points && key === 'focus'){
-      const relatedFocus = { battle:['character'], character:['battle','worldbuilding'], story:['worldbuilding'], romance:['character'], worldbuilding:['story','character'] };
-      if(relatedFocus[expected]?.includes(actual)) points = Math.round(max * .45);
-    }
-    breakdown.push({ key, label:{genre:'장르',mood:'감정',world:'세계관',pace:'전개',length:'분량',intensity:'강도',tone:'분위기',focus:'중점 재미',era:'작품 감성'}[key], expected:labelFor(key, expected), actual:labelFor(key, actual), points, max });
+    if(!points && key === 'tone' && relatedTone[expected]?.includes(actual)) points = Math.round(max * .45);
+    if(!points && key === 'focus' && relatedFocus[expected]?.includes(actual)) points = Math.round(max * .45);
+    breakdown.push({ key, label:breakdownLabels[key], expected:labelFor(key, expected), actual:labelFor(key, actual), points, max });
     score += points;
   });
   let profilePoints = 0;
   Object.entries(profile.prefer).forEach(([key,value]) => { if(signals[key] === value || anime[key] === value) profilePoints += 12; });
-  profilePoints = Math.min(weights.profile, profilePoints);
-  breakdown.push({ key:'profile', label:'프로필 보정', expected:profile.name, actual:profileDescription(profile), points:profilePoints, max:weights.profile });
+  profilePoints = Math.min(scoreWeights.profile, profilePoints);
+  breakdown.push({ key:'profile', label:'프로필 보정', expected:profile.name, actual:profileDescription(profile), points:profilePoints, max:scoreWeights.profile });
   score += profilePoints;
-  const maxScore = Object.values(weights).reduce((a,b)=>a+b,0);
-  const percent = Math.min(99, Math.max(32, Math.round((score / maxScore) * 100)));
-  return { score, maxScore, percent, breakdown, signals };
+  const percent = Math.min(99, Math.max(32, Math.round((score / scoreMax) * 100)));
+  const details = { score, maxScore:scoreMax, percent, breakdown, signals };
+  return rememberScore(cacheKey, details);
 }
 
 function reasonForAnime(anime, answers = surveyAnswers){
@@ -564,7 +581,7 @@ function initScrollMotion(){
 function bindEvents(){
   $('#menuButton')?.addEventListener('click', e => { const menu = $('#mobileMenu'); const open = !menu.classList.contains('hidden'); menu.classList.toggle('hidden'); e.currentTarget.setAttribute('aria-expanded', String(!open)); trackEvent('mobile_menu_toggle', { open: String(!open) }); });
   $$('#themeToggle,#themeToggleMobile').forEach(btn=>btn?.addEventListener('click', toggleTheme));
-  $('#profileGrid').addEventListener('click', e => { const card = e.target.closest('[data-profile]'); if(!card) return; activeProfile = card.dataset.profile; localStorage.setItem('anipick-profile', activeProfile); renderProfiles(); renderSurveyResult(); renderHero(); trackEvent('profile_select', { profile: activeProfile }); });
+  $('#profileGrid').addEventListener('click', e => { const card = e.target.closest('[data-profile]'); if(!card) return; activeProfile = card.dataset.profile; localStorage.setItem('anipick-profile', activeProfile); clearScoreCache(); renderProfiles(); renderSurveyResult(); renderHero(); trackEvent('profile_select', { profile: activeProfile }); });
   $$('.filter-chip').forEach(btn=>btn.addEventListener('click',()=>{ $$('.filter-chip').forEach(c=>c.classList.remove('active')); btn.classList.add('active'); currentFilter=btn.dataset.filter; currentPage=1; setRecommendOpen(true); trackEvent('genre_filter', { filter: currentFilter }); }));
   $('#surveyForm').addEventListener('click', e => { const option = e.target.closest('[data-survey-key]'); if(option) selectSurveyAnswer(option.dataset.surveyKey, option.dataset.surveyValue); });
   $('#surveyBackButton').addEventListener('click',()=>{ if(surveyStep > 0){ surveyStep -= 1; renderSurveyQuestion(); } });
