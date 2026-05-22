@@ -660,8 +660,9 @@ html[data-theme='dark'] .collection-badge { color: #ffd7dd; }
 .shelf-card.completed .shelf-check { animation: checkFlash .75s ease; }
 .shelf-check span { display: grid; place-items: center; width: 4.2rem; aspect-ratio: 1; border-radius: 999px; background: #22c55e; color: #fff; font-size: 2rem; box-shadow: 0 18px 48px rgba(34,197,94,.34); }
 
-.reveal { opacity: 0; transform: translateY(24px); transition: opacity .48s ease, transform .48s ease; transition-delay: var(--reveal-delay, 0s); }
-.reveal.is-visible { opacity: 1; transform: translateY(0); }
+.reveal { opacity: 1; transform: none; }
+.motion-ready .reveal { opacity: 0; transform: translateY(24px); transition: opacity .48s ease, transform .48s ease; transition-delay: var(--reveal-delay, 0s); }
+.motion-ready .reveal.is-visible { opacity: 1; transform: translateY(0); }
 .parallax-soft { transform: translateY(var(--parallax-y, 0px)); transition: transform .12s linear; }
 
 @keyframes resultSpin { to { transform: rotate(360deg); } }

@@ -123,6 +123,7 @@ const defaultSurveyAnswers = { mood:'power', world:'modern', pace:'fast', length
 let surveyAnswers = { ...defaultSurveyAnswers };
 let surveyStep = 0;
 let heroBackdropTimer;
+let revealObserver;
 let currentFilter = 'all';
 let activeProfile = localStorage.getItem('anipick-profile') || 'solo';
 let watchlist = JSON.parse(localStorage.getItem('anipick-watchlist-v2') || '[]');
@@ -252,6 +253,7 @@ function renderSurveyResult(answers = null, animated = false){
 function renderGrid(){
   const items = currentFilter === 'all' ? animeList : animeList.filter(anime => anime.genre === currentFilter);
   $('#animeGrid').innerHTML = items.map(anime => `<article class="anime-card" tabindex="0">${preview(anime)}${poster(anime)}<div class="p-3"><div class="mt-1 flex items-start justify-between gap-4"><div><p class="text-xs font-black uppercase tracking-[.2em] text-[var(--accent)]">${genreLabels[anime.genre]}</p><h3 class="mt-1 font-kr text-xl font-black">${anime.title}</h3></div>${addButton(anime.id)}</div><p class="mt-3 min-h-[4.5rem] text-sm leading-6 text-[var(--muted)]">${anime.summary}</p><p class="recommend-reason mt-3">${reasonForAnime(anime)}</p></div></article>`).join('');
+  applyRevealMotion($$('#animeGrid .anime-card'));
 }
 function renderWatchlistTabs(){
   const counts = watchlist.reduce((acc,id)=>{ const s = watchStatus[id] || 'want'; acc[s] = (acc[s]||0)+1; return acc; }, {});
@@ -269,6 +271,7 @@ function renderWatchlist(){
     const status = watchStatus[anime.id] || 'want';
     return `<article class="shelf-card ${status==='done'?'completed':''}"><button class="shelf-remove" data-remove="${anime.id}" type="button" aria-label="${anime.title} 삭제">×</button><div class="shelf-check"><span>✓</span></div><img class="shelf-poster" src="${anime.image}" alt="${anime.title} 포스터" loading="lazy" /><div class="shelf-info"><p class="kicker !mb-1">${statusIcon(status)} ${statusLabel(status)}</p><h3 class="font-kr text-lg font-black">${anime.title}</h3><p class="mt-2 text-xs leading-5 text-[var(--muted)]">${reasonForAnime(anime)}</p><div class="shelf-status">${['want','watching','done'].map(s=>`<button class="${status===s?'active':''}" type="button" data-watch-status="${s}" data-watch-id="${anime.id}">${statusLabel(s)}</button>`).join('')}</div></div></article>`;
   }).join('');
+  applyRevealMotion($$('#watchlistItems .shelf-card'));
 }
 function addToWatchlist(id){ if(!watchlist.includes(id)){ watchlist.push(id); watchStatus[id] = watchStatus[id] || 'want'; saveWatchlist(); renderWatchlist(); trackEvent('watchlist_add', animePayload(findAnime(id))); } }
 function removeFromWatchlist(id){ const anime = findAnime(id); watchlist = watchlist.filter(item => item !== id); delete watchStatus[id]; saveWatchlist(); renderWatchlist(); trackEvent('watchlist_remove', animePayload(anime)); }
@@ -326,11 +329,40 @@ async function downloadResultImage(){
   a.href = url; a.download = 'anipick-result.png'; a.click(); URL.revokeObjectURL(url);
   trackEvent('result_image_download', animePayload(lastSurveyResult.top.anime));
 }
+function applyRevealMotion(elements){
+  const targets = [...elements].filter(Boolean);
+  targets.forEach((el, index)=>{
+    el.classList.add('reveal');
+    el.style.setProperty('--reveal-delay', `${Math.min(index * 0.02, .24)}s`);
+    const rect = el.getBoundingClientRect();
+    const alreadyInView = rect.top < window.innerHeight * 1.15 && rect.bottom > -80;
+    if(revealObserver && !alreadyInView) revealObserver.observe(el);
+    else el.classList.add('is-visible');
+  });
+}
 function initScrollMotion(){
   const targets = $$('section, .anime-card, .profile-card, .watch-card, .glass-card');
-  targets.forEach((el, index)=>{ el.classList.add('reveal'); el.style.setProperty('--reveal-delay', `${Math.min(index * 0.02, .24)}s`); });
-  const observer = new IntersectionObserver(entries => entries.forEach(entry => { if(entry.isIntersecting){ entry.target.classList.add('is-visible'); observer.unobserve(entry.target); } }), { threshold:.12, rootMargin:'0px 0px -6% 0px' });
-  targets.forEach(el=>observer.observe(el));
+  if(!('IntersectionObserver' in window)){
+    targets.forEach(el => el.classList.add('reveal', 'is-visible'));
+    return;
+  }
+  document.body.classList.add('motion-ready');
+  revealObserver = new IntersectionObserver(entries => entries.forEach(entry => {
+    if(entry.isIntersecting){ entry.target.classList.add('is-visible'); revealObserver.unobserve(entry.target); }
+  }), { threshold:.04, rootMargin:'0px 0px 18% 0px' });
+  applyRevealMotion(targets);
+  requestAnimationFrame(()=>{
+    $$('.reveal').forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if(rect.top < window.innerHeight * 1.12 && rect.bottom > -80) el.classList.add('is-visible');
+    });
+  });
+  setTimeout(()=>{
+    $$('.reveal:not(.is-visible)').forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if(rect.top < window.innerHeight * 1.35) el.classList.add('is-visible');
+    });
+  }, 700);
   $$('.hero-backdrop,.shrine-silhouette').forEach(el=>el.classList.add('parallax-soft'));
   window.addEventListener('scroll', () => { const y = Math.min(36, window.scrollY * .035); $$('.parallax-soft').forEach(el=>el.style.setProperty('--parallax-y', `${y}px`)); }, { passive:true });
 }
