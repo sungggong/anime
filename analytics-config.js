@@ -4,7 +4,7 @@
 // 방문자에게 동의 배너를 먼저 보여준 뒤, 허용한 경우에만 익명 이벤트를 전송합니다.
 window.ANIPICK_ANALYTICS_CONFIG = {
   provider: 'ga4',
-  measurementId: '', // 예: 'G-XXXXXXXXXX'
+  measurementId: 'G-ZQ8WZ0SKF4', // 예: 'G-XXXXXXXXXX'
   enabled: true,
   requireConsent: true,
   anonymizeIp: true,

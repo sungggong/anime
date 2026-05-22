@@ -27,8 +27,20 @@
     return !config.requireConsent || localStorage.getItem(consentKey) === 'granted';
   }
 
+  function updateGoogleConsent(value) {
+    if (typeof window.gtag !== 'function') return;
+    const granted = value === 'granted';
+    window.gtag('consent', 'update', {
+      analytics_storage: granted ? 'granted' : 'denied',
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+    });
+  }
+
   function setConsent(value) {
     localStorage.setItem(consentKey, value);
+    updateGoogleConsent(value);
     removeConsentBanner();
     if (value === 'granted') {
       initProvider();
@@ -86,9 +98,12 @@
 
     if (config.provider === 'ga4') {
       window.dataLayer = window.dataLayer || [];
-      window.gtag = function gtag(){ window.dataLayer.push(arguments); };
-      await loadScript(`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(config.measurementId)}`);
-      window.gtag('js', new Date());
+      window.gtag = window.gtag || function gtag(){ window.dataLayer.push(arguments); };
+      updateGoogleConsent('granted');
+      const existingTag = document.querySelector(`script[src*="googletagmanager.com/gtag/js?id=${CSS.escape(config.measurementId)}"]`);
+      if (!existingTag) {
+        await loadScript(`https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(config.measurementId)}`);
+      }
       window.gtag('config', config.measurementId, {
         anonymize_ip: config.anonymizeIp,
         send_page_view: false,
