@@ -1,0 +1,1 @@
+Build a simple anime shelf for want-to-watch, watching and completed titles.

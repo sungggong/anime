@@ -1,0 +1,1 @@
+A fast mood-based anime picker for nights when you cannot decide what to watch.
